@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reverse Engineering Report</title>
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --border:#e6e9ef;
+  --text:#0f172a;
+  --muted:#64748b;
+  --accent:#2563eb;
+  --radius:10px;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color:var(--text);
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:32px 24px 60px;
+}
+
+header{
+  margin-bottom:26px;
+}
+
+h1{
+  margin:0 0 4px 0;
+  font-size:28px;
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.section{
+  margin-top:32px;
+}
+
+.section-title{
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.04);
+  transition:all .15s ease;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px rgba(0,0,0,0.07);
+}
+
+.card-label{
+  font-size:11px;
+  color:var(--muted);
+}
+
+.card-value{
+  font-size:14px;
+  font-weight:600;
+  margin-top:3px;
+}
+
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:13px;
+}
+
+.tag{
+  display:inline-block;
+  font-size:12px;
+  padding:4px 9px;
+  border-radius:6px;
+  margin:4px 6px 4px 0;
+  border:1px solid var(--border);
+  background:#f1f5f9;
+}
+
+.tag.blue{background:#e8f0ff;color:#1d4ed8}
+.tag.teal{background:#e6fffa;color:#0f766e}
+.tag.amber{background:#fff7ed;color:#b45309}
+.tag.red{background:#fee2e2;color:#b91c1c}
+
+.alert{
+  display:flex;
+  gap:10px;
+  padding:14px 16px;
+  border-radius:var(--radius);
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  font-size:13px;
+}
+
+.alert-icon{
+  font-size:16px;
+}
+
+.tools{
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.search{
+  flex:1;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+
+.tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.tab{
+  font-size:12px;
+  padding:6px 14px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:white;
+  color:var(--muted);
+  cursor:pointer;
+}
+
+.tab.active{
+  background:var(--accent);
+  color:white;
+  border-color:var(--accent);
+}
+
+.endpoint-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.ep{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:12px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:7px 10px;
+}
+
+.ep:hover{
+  background:#f8fafc;
+}
+
+.method{
+  font-weight:700;
+  font-size:11px;
+  width:48px;
+}
+
+.get{color:#2563eb}
+.post{color:#059669}
+.put{color:#d97706}
+.del{color:#dc2626}
+
+.path{
+  flex:1;
+}
+
+.copy{
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.copy:hover{
+  color:var(--accent);
+}
+
+.footer{
+  margin-top:50px;
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.dark-toggle{
+  position:fixed;
+  top:16px;
+  right:16px;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:white;
+  cursor:pointer;
+  font-size:12px;
+}
+
+body.dark{
+  --bg:#0f172a;
+  --card:#1e293b;
+  --border:#334155;
+  --text:#e2e8f0;
+  --muted:#94a3b8;
+}
+
+</style>
+</head>
+
+<body>
+
+<button class="dark-toggle" onclick="toggleDark()">Toggle theme</button>
+
+<div class="container">
+
+<header>
+<h1>Reverse Engineering Report</h1>
+<div class="subtitle">apps4lab – frontend bundle analysis</div>
+</header>
+
+<div class="alert">
+<span class="alert-icon">⚠</span>
+<span>Google OAuth Client ID exposed in bundle. Auth tokens stored in localStorage.</span>
+</div>
+
+<div class="section">
+<div class="section-title">App overview</div>
+
+<div class="cards">
+<div class="card"><div class="card-label">App name</div><div class="card-value">apps4lab</div></div>
+<div class="card"><div class="card-label">Backend</div><div class="card-value mono">https://apps4lab.be/api</div></div>
+<div class="card"><div class="card-label">Auth</div><div class="card-value">Google OAuth → JWT</div></div>
+<div class="card"><div class="card-label">Bundle</div><div class="card-value">2.6MB JS</div></div>
+</div>
+
+</div>
+
+<div class="section">
+<div class="section-title">Tech stack</div>
+
+<span class="tag blue">React</span>
+<span class="tag blue">React Router</span>
+<span class="tag blue">Material UI</span>
+<span class="tag teal">Axios</span>
+<span class="tag teal">Google APIs</span>
+<span class="tag amber">Webpack</span>
+
+</div>
+
+<div class="section">
+<div class="section-title">API endpoints</div>
+
+<div class="tools">
+<input class="search" placeholder="Search endpoints..." id="search" />
+</div>
+
+<div class="tabs">
+<div class="tab active" data-method="all">All</div>
+<div class="tab" data-method="get">GET</div>
+<div class="tab" data-method="post">POST</div>
+<div class="tab" data-method="put">PUT</div>
+<div class="tab" data-method="del">DELETE</div>
+</div>
+
+<div class="endpoint-list" id="list"></div>
+
+</div>
+
+<div class="footer">Generated reverse engineering summary</div>
+
+</div>
+
+<script>
+
+const endpoints = [
+
+['GET','/leerlingen'],
+['GET','/leerlingen/:id'],
+['GET','/leerlingen/klassen'],
+
+['GET','/aanwezigheden/leerling/:id/'],
+['POST','/aanwezigheden/:id/'],
+['POST','/aanwezigheden/batch_registreren'],
+
+['GET','/evaluatie/competenties'],
+['GET','/evaluatie/competenties/:id'],
+['GET','/evaluatie/projecten'],
+['GET','/evaluatie/rapporten'],
+['POST','/evaluatie/rapporten'],
+['PUT','/evaluatie/rapporten/:id'],
+
+['GET','/evaluatie/labdoel/:id'],
+['POST','/evaluatie/labdoel'],
+['PUT','/evaluatie/labdoel/:id'],
+['PUT','/evaluatie/labdoel/:id/move'],
+['DELETE','/evaluatie/labdoel/:id'],
+
+['GET','/evaluatie/leerplandoelen/:id'],
+['GET','/evaluatie/opdrachten/:id/labdoelen'],
+['GET','/evaluatie/opdrachten/:id/resultaten'],
+
+['POST','/evaluatie/opdrachten/'],
+['PUT','/evaluatie/opdrachten/:id'],
+['POST','/evaluatie/opdrachten/:id/score'],
+['POST','/evaluatie/opdrachten/:id/feedback'],
+['POST','/evaluatie/opdrachten/kopieer'],
+
+['GET','/evaluatie/vakscores/:id/'],
+
+['POST','/evaluatie/rapport'],
+['POST','/evaluatie/rapport/genereren/:id'],
+
+['GET','/evaluatie/rapport/commentaren'],
+['POST','/evaluatie/rapport/commentaren/'],
+
+['POST','/evaluatie/jaaroverzicht'],
+['POST','/evaluatie/jaaroverzicht-projecten'],
+
+['GET','/chromebooks'],
+['GET','/chromebooks/geen_toestel'],
+['GET','/chromebooks/:serienummer'],
+['POST','/chromebooks/:serienummer'],
+
+['GET','/chromebooks/:serienummer/herstelling'],
+['POST','/chromebooks/:serienummer/herstelling'],
+
+['GET','/chromebooks/:serienummer/uitlenen'],
+['POST','/chromebooks/:serienummer/uitlenen'],
+
+['GET','/kalender/:id'],
+['POST','/kalender/activiteit'],
+['PUT','/kalender/activiteit/:id'],
+['DELETE','/kalender/activiteit/:id'],
+
+['GET','/lessenrooster/lkr/:id/'],
+['GET','/lessenrooster/lln/:id/'],
+
+['GET','/roosteren/deelprojecten'],
+['GET','/roosteren/routekeuzes'],
+['PUT','/roosteren/routekeuzes/:id'],
+
+['GET','/roosteren/werkbelasting'],
+['POST','/roosteren/werkbelasting'],
+['POST','/roosteren/werkbelasting/copy'],
+
+['GET','/schooljaar/deelprojecten/:id/'],
+['POST','/schooljaar/deelprojecten/:id'],
+['PUT','/schooljaar/deelprojecten/:id'],
+
+['GET','/schooljaar/projectweken/:id'],
+['POST','/schooljaar/init'],
+
+['GET','/gebruikers/acros'],
+['GET','/gebruikers/:id/'],
+
+['PUT','/leerlingen/relaties/:id'],
+
+['GET','/zorg/diagnoses'],
+['PUT','/zorg/diagnoses/:id'],
+['GET','/zorg/overzicht'],
+
+['GET','/zorg/dashboard/:acro'],
+['GET','/zorg/dashboard/:acro/1'],
+
+['GET','/zorg/zorg_opties'],
+['POST','/zorg/overleggen/:id'],
+
+['POST','/zorg/overtreding/:leerling_id'],
+['DELETE','/zorg/overtreding/:id'],
+
+['POST','/zorg/verhoogde_zorg'],
+['DELETE','/zorg/verhoogde_zorg/:id'],
+
+['GET','/externe_zorg'],
+['GET','/externe_zorg/:id'],
+['POST','/externe_zorg'],
+['PUT','/externe_zorg'],
+
+['GET','/ibp/info/:leerling_id'],
+['POST','/ibp/generate'],
+['DELETE','/ibp/:leerling_id'],
+
+['GET','/api/projects/:id/weeks']
+
+];
+
+const list=document.getElementById('list')
+
+function render(){
+
+const q=document.getElementById('search').value.toLowerCase()
+
+const method=document.querySelector('.tab.active').dataset.method
+
+list.innerHTML=''
+
+endpoints.forEach(([m,p])=>{
+
+if(method!=='all'&&method!==m.toLowerCase())return
+
+if(!p.includes(q)&&!m.toLowerCase().includes(q))return
+
+const el=document.createElement('div')
+
+el.className='ep'
+
+el.innerHTML=`
+
+<span class="method ${m.toLowerCase()}">${m}</span>
+
+<span class="path">${p}</span>
+
+<button class="copy">copy</button>
+
+`
+
+el.querySelector('.copy').onclick=()=>{
+
+navigator.clipboard.writeText(m+' '+p)
+
+}
+
+list.appendChild(el)
+
+})
+
+}
+
+render()
+
+document.getElementById('search').oninput=render
+
+Array.from(document.querySelectorAll('.tab')).forEach(t=>{
+
+ t.onclick=()=>{
+
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'))
+
+ t.classList.add('active')
+
+ render()
+
+ }
+
+})
+
+function toggleDark(){
+
+ document.body.classList.toggle('dark')
+
+}
+
+</script>
+
+</body>
+</html>
