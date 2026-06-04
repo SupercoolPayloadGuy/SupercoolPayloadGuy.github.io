@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remington Rand — Herstelproject</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --paper: #f5f0e8;
+    --paper-dark: #ede6d4;
+    --ribbon-red: #c0392b;
+    --ribbon-black: #1a1209;
+    --key-metal: #8b7355;
+    --accent: #c0392b;
+    --done: #2d6a4f;
+    --warn: #b5451b;
+    --neutral: #5a4e3a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 27px,
+        rgba(0,0,0,0.04) 27px,
+        rgba(0,0,0,0.04) 28px
+      );
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(255,255,255,0.02) 3px,
+      rgba(255,255,255,0.02) 4px
+    );
+  }
+
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .machine-label {
+    font-family: 'Special Elite', cursive;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--key-metal);
+    margin-bottom: 0.4rem;
+  }
+
+  h1 {
+    font-family: 'Special Elite', cursive;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: 0.03em;
+    color: var(--paper);
+  }
+
+  h1 span {
+    color: var(--ribbon-red);
+  }
+
+  .subtitle {
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+    color: rgba(245,240,232,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    color: var(--key-metal);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-track {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ribbon-red), #e67e22);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* MAIN */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* PHASE BLOCKS */
+  .phase {
+    margin-bottom: 2.5rem;
+    border-left: 3px solid var(--paper-dark);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .phase.active { border-left-color: var(--ribbon-red); }
+  .phase.complete { border-left-color: var(--done); }
+
+  .phase-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .phase-num {
+    font-family: 'Special Elite', cursive;
+    font-size: 2rem;
+    color: var(--paper-dark);
+    line-height: 1;
+    min-width: 2rem;
+  }
+
+  .phase.active .phase-num { color: var(--ribbon-red); }
+  .phase.complete .phase-num { color: var(--done); }
+
+  .phase-title {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .phase-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2em 0.6em;
+    border-radius: 2px;
+    margin-left: auto;
+  }
+
+  .badge-active { background: var(--ribbon-red); color: white; }
+  .badge-pending { background: var(--paper-dark); color: var(--neutral); }
+  .badge-done { background: var(--done); color: white; }
+
+  /* TASK LIST */
+  .tasks { list-style: none; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 2px;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .task:last-child { border-bottom: none; }
+  .task:hover { background: rgba(0,0,0,0.03); }
+
+  .task-check {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 2px solid var(--key-metal);
+    border-radius: 2px;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: white;
+    transition: all 0.2s;
+    background: transparent;
+  }
+
+  .task.done .task-check {
+    background: var(--done);
+    border-color: var(--done);
+  }
+
+  .task.done .task-check::after { content: '✓'; }
+
+  .task-text {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .task.done .task-text {
+    text-decoration: line-through;
+    color: var(--neutral);
+    opacity: 0.6;
+  }
+
+  .task-note {
+    font-size: 0.68rem;
+    color: var(--neutral);
+    margin-top: 0.15rem;
+    font-style: italic;
+  }
+
+  .task-warning {
+    font-size: 0.68rem;
+    color: var(--warn);
+    margin-top: 0.15rem;
+  }
+
+  /* SUPPLIES BOX */
+  .supplies-box {
+    background: var(--paper-dark);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 3px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+    font-size: 0.75rem;
+  }
+
+  .supplies-box h3 {
+    font-family: 'Special Elite', cursive;
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.05em;
+  }
+
+  .supply-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px dotted rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+  .supply-row:last-child { border-bottom: none; }
+
+  .supply-check {
+    width: 14px; height: 14px; min-width: 14px;
+    border: 1.5px solid var(--key-metal);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: white;
+    transition: all 0.2s;
+  }
+
+  .supply-row.got .supply-check {
+    background: var(--done);
+    border-color: var(--done);
+  }
+  .supply-row.got .supply-check::after { content: '✓'; }
+  .supply-row.got span { text-decoration: line-through; opacity: 0.5; }
+
+  .supply-link {
+    margin-left: auto;
+    font-size: 0.62rem;
+    color: var(--ribbon-red);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+  .supply-link:hover { text-decoration: underline; }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem;
+    border-radius: 3px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Special Elite', cursive;
+    font-size: 2rem;
+    color: var(--ribbon-red);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--key-metal);
+    margin-top: 0.3rem;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 2px solid var(--ink);
+    margin: 2.5rem 0;
+    position: relative;
+  }
+
+  .divider::after {
+    content: '— ✦ —';
+    position: absolute;
+    top: -0.7em;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--paper);
+    padding: 0 0.5rem;
+    font-family: 'Special Elite', cursive;
+    font-size: 0.85rem;
+    color: var(--key-metal);
+  }
+
+  /* RESET BUTTON */
+  .reset-btn {
+    background: none;
+    border: 1px dashed var(--key-metal);
+    color: var(--neutral);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 0.4em 0.8em;
+    cursor: pointer;
+    border-radius: 2px;
+    float: right;
+    margin-top: -0.2rem;
+  }
+  .reset-btn:hover { border-color: var(--ribbon-red); color: var(--ribbon-red); }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.65rem;
+    color: var(--neutral);
+    letter-spacing: 0.1em;
+    border-top: 1px dashed rgba(0,0,0,0.15);
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    main, .progress-wrap { padding: 1rem; }
+    .stats { grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
+    .stat-num { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="machine-label">Herstelproject #001</div>
+    <h1>Remington Rand<br><span>Master-Riter</span></h1>
+    <div class="subtitle">N.V. Holland &nbsp;·&nbsp; Restauratie + USB Keyboard Conversie</div>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span id="progress-text">Voortgang laden...</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+</div>
+
+<main>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="stat-done">0</div>
+      <div class="stat-label">Gedaan</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-left">0</div>
+      <div class="stat-label">Te doen</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">Totaal</div>
+    </div>
+  </div>
+
+  <!-- BENODIGDHEDEN -->
+  <div class="supplies-box">
+    <h3>🛒 Benodigdheden — aanschaffen</h3>
+    <div class="supply-row" data-supply="ipa" onclick="toggleSupply(this)">
+      <div class="supply-check"></div>
+      <span>Isopropylalcohol 99% (IPA)</span>
+      <a class="supply-link" href="https://www.bol.com/nl/nl/s/?searchtext=isopropylalcohol+99" target="_blank">bol.com →</a>
+    </div>
+    <div class="supply-row" data-supply="olie" onclick="toggleSupply(this)">
+      <div class="supply-check"></div>
+      <span>Naaimachine-olie</span>
+      <a class="supply-link" href="https://www.bol.com/nl/nl/s/?searchtext=naaimachine+olie" target="_blank">bol.com →</a>
+    </div>
+    <div class="supply-row" data-supply="lint" onclick="toggleSupply(this)">
+      <div class="supply-check"></div>
+      <span>Typelint groep 1 zwart (½ inch dubbele spoel)</span>
+      <a class="supply-link" href="https://www.gtb4u.nl/Inktlint-universeel-zwart/rood-gr.1-Scheidegger-DIN-32755,-gabrielle,-Remington,-vendex,-520825" target="_blank">gtb4u.nl →</a>
+    </div>
+    <div class="supply-row" data-supply="pico" onclick="toggleSupply(this)">
+      <div class="supply-check"></div>
+      <span>Raspberry Pi Pico (fase 2)</span>
+      <a class="supply-link" href="https://www.kiwi-electronics.com/nl/raspberry-pi-pico-10091" target="_blank">kiwi-electronics →</a>
+    </div>
+    <div class="supply-row" data-supply="reed" onclick="toggleSupply(this)">
+      <div class="supply-check"></div>
+      <span>Reed-schakelaars + kleine magneetjes (fase 2)</span>
+      <a class="supply-link" href="https://www.bol.com/nl/nl/s/?searchtext=reed+schakelaar+set" target="_blank">bol.com →</a>
+    </div>
+    <div class="supply-row" data-supply="kabels" onclick="toggleSupply(this)">
+      <div class="supply-check"></div>
+      <span>Dupont-kabeltjes (fase 2)</span>
+      <a class="supply-link" href="https://www.kiwi-electronics.com/nl/dupont-kabeltjes" target="_blank">kiwi-electronics →</a>
+    </div>
+  </div>
+
+  <!-- FASE 1 -->
+  <div class="phase active" id="phase-1">
+    <div class="phase-header">
+      <div class="phase-num">1</div>
+      <div>
+        <div class="phase-title">Uitwendige Reiniging</div>
+      </div>
+      <span class="phase-badge badge-active" id="badge-1">Bezig</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-1">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Machine buiten of bij open raam plaatsen
+          <div class="task-note">Er komt stof en oud vet vrij tijdens reiniging</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Alle zichtbaar stof wegborstelen met droge tandenborstel
+          <div class="task-note">Werk van boven naar beneden — typearmen, scharnierpunten, wagen</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Elke typearm individueel met vinger op/neer bewegen
+          <div class="task-note">Noteer welke armen weerstand geven of vastzitten</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Wagentest: wagen met de hand van links naar rechts schuiven
+          <div class="task-warning">⚠ Als wagen niet beweegt → eerst onderzoeken voor reiniging</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Shift-toetsen links en rechts indrukken en controleren
+          <div class="task-note">Bewegen ze? Voelen ze vrij of stroef?</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FASE 2 -->
+  <div class="phase" id="phase-2">
+    <div class="phase-header">
+      <div class="phase-num">2</div>
+      <div>
+        <div class="phase-title">Dieptereiniging met IPA</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-2">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-2">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          IPA op wattenstaafje deppen — elk scharnierpunt behandelen
+          <div class="task-note">Druppel voor druppel, laat even intrekken</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Vastgeplakte typearmen voorzichtig loswrikken na IPA-behandeling
+          <div class="task-warning">⚠ Nooit forceren — altijd eerst IPA, daarna zacht bewegen</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Wagen-escapement reinigen met IPA
+          <div class="task-note">Dit is het tandwiel-mechanisme dat de wagen stap voor stap beweegt</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Shift-scharnierpunten reinigen met IPA
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Alles laten drogen (minimum 10 minuten)
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Scharnierpunten hersmeren met één druppel naaimachine-olie per punt
+          <div class="task-warning">⚠ Uiterst spaarzaam — teveel olie trekt stof aan</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FASE 3 -->
+  <div class="phase" id="phase-3">
+    <div class="phase-header">
+      <div class="phase-num">3</div>
+      <div>
+        <div class="phase-title">Wagenretour & Escapement</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-3">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-3">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Grote hendel links (wagenretour) indrukken en controleren
+          <div class="task-note">Beweegt hij? Geeft hij weerstand?</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Controleren of wagen vergrendeling actief is
+          <div class="task-note">Soms staat er een klein vergrendelknopje aan</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Wagenveer visueel inspecteren (aan de onderkant van de wagen)
+          <div class="task-note">Is de veer aanwezig en gespannen?</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Escapement-tandjes reinigen en één toets indrukken — verschuift wagen precies één positie?
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FASE 4 -->
+  <div class="phase" id="phase-4">
+    <div class="phase-header">
+      <div class="phase-num">4</div>
+      <div>
+        <div class="phase-title">Typelint Vervangen</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-4">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-4">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Oud lint verwijderen — beide spoelen uitnemen
+          <div class="task-note">Foto maken voor je begint zodat je het terug kunt plaatsen</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Nieuw lint op originele spoelen winden
+          <div class="task-note">Het lint pinnetje prikt gewoon door het stof van het nieuwe lint</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Lint door de lintvork (de U-vorken bij de typearmen) rijgen
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Spoelen terugplaatsen en controleren dat ze draaien bij typen
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Automatische richtingswisseling van het lint testen
+          <div class="task-note">Aan het einde van de spoel wisselt het mechanisme van richting</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FASE 5 -->
+  <div class="phase" id="phase-5">
+    <div class="phase-header">
+      <div class="phase-num">5</div>
+      <div>
+        <div class="phase-title">Functietest — Machine Werkend</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-5">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-5">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Papier invoeren — pakt de grote rubberen rol het papier?</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Papierknop rechts soepel draaien</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Alle letters van het alfabet typen en afdruk controleren</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Shift-functie testen (hoofdletters)</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Spatiebalk testen — verschuift wagen één positie?</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Wagenretour testen — gaat wagen terug naar begin van de regel?</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Bel aan einde van de regel horen? ✅
+          <div class="task-note">Als dit werkt: de machine is klaar voor fase 2!</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FASE 6 -->
+  <div class="phase" id="phase-6">
+    <div class="phase-header">
+      <div class="phase-num">6</div>
+      <div>
+        <div class="phase-title">Elektronica Voorbereiding</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-6">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-6">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Raspberry Pi Pico kopen en MicroPython installeren
+          <div class="task-note">Gratis download op micropython.org — sluit Pico aan via USB en sleep het .uf2 bestand erop</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Thonny IDE installeren op je computer (gratis)
+          <div class="task-note">thonny.org — hiermee programmeer je de Pico</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Pico testen als USB HID keyboard met test-code
+          <div class="task-note">Er bestaat een kant-en-klare library: "HID keyboard" voor Pico</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Reed-schakelaars en magneetjes ontvangen en testen</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FASE 7 -->
+  <div class="phase" id="phase-7">
+    <div class="phase-header">
+      <div class="phase-num">7</div>
+      <div>
+        <div class="phase-title">Proof of Concept — 5 Toetsen</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-7">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-7">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Magneetje plakken op typearm van de letter A
+          <div class="task-note">Kleine epoxy of dubbelzijdig sterk tape — aan de zijkant van de arm</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Reed-schakelaar positioneren onder typearm A — positie fine-tunen</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Schakelaar verbinden met Pico GP0 pin via dupont-kabel
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          MicroPython code schrijven: GP0 → stuur "a" naar pc
+          <div class="task-note">Simpele if-statement: if pin.value() == 0: keyboard.send("a")</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Letter A typen op machine → verschijnt "a" op pc ✅</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Zelfde herhalen voor S, D, F, spatiebalk</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- FASE 8 -->
+  <div class="phase" id="phase-8">
+    <div class="phase-header">
+      <div class="phase-num">8</div>
+      <div>
+        <div class="phase-title">Volledige Keyboard Mapping</div>
+      </div>
+      <span class="phase-badge badge-pending" id="badge-8">Wachten</span>
+    </div>
+    <ul class="tasks" id="tasks-phase-8">
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Alle 44 typearmen voorzien van magneetjes</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Reed-schakelaars voor alle armen monteren en bedraden</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Kleine printplaat of breadboard voor schakelaar-matrix monteren
+          <div class="task-note">De Pico heeft 26 GPIO-pinnen — meer dan genoeg voor alle toetsen</div>
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Volledige keymap programmeren in MicroPython</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Shift-toets koppelen (hoofdletters)</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">Pico netjes wegwerken binnenin de machine</div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          USB-kabel uitvoeren via achterkant of onderkant van de machine
+        </div>
+      </li>
+      <li class="task" onclick="toggleTask(this)">
+        <div class="task-check"></div>
+        <div class="task-text">
+          Volledig alfabet typen — alle letters verschijnen correct op pc 🎉
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">↺ Alles resetten</button>
+  <div style="clear:both; height: 2rem;"></div>
+
+</main>
+
+<footer>
+  REMINGTON RAND MASTER-RITER &nbsp;·&nbsp; N.V. HOLLAND &nbsp;·&nbsp; HERSTELPROJECT &nbsp;·&nbsp; KLIK OP TAKEN OM AF TE VINKEN
+</footer>
+
+<script>
+const STORAGE_KEY = 'remington_progress';
+
+function getState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { tasks: {}, supplies: {} };
+  } catch { return { tasks: {}, supplies: {} }; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getTaskId(el) {
+  const phase = el.closest('.phase').id;
+  const idx = Array.from(el.parentElement.children).indexOf(el);
+  return `${phase}_${idx}`;
+}
+
+function toggleTask(el) {
+  const state = getState();
+  const id = getTaskId(el);
+  state.tasks[id] = !state.tasks[id];
+  saveState(state);
+  applyState();
+}
+
+function toggleSupply(el) {
+  const state = getState();
+  const key = el.dataset.supply;
+  state.supplies[key] = !state.supplies[key];
+  saveState(state);
+  applyState();
+}
+
+function applyState() {
+  const state = getState();
+
+  // Apply tasks
+  document.querySelectorAll('.task').forEach(el => {
+    const id = getTaskId(el);
+    el.classList.toggle('done', !!state.tasks[id]);
+  });
+
+  // Apply supplies
+  document.querySelectorAll('.supply-row').forEach(el => {
+    el.classList.toggle('got', !!state.supplies[el.dataset.supply]);
+  });
+
+  // Update stats and progress
+  const allTasks = document.querySelectorAll('.task');
+  const doneTasks = document.querySelectorAll('.task.done');
+  const total = allTasks.length;
+  const done = doneTasks.length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-left').textContent = total - done;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done} van ${total} stappen voltooid`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+
+  // Update phase badges
+  for (let i = 1; i <= 8; i++) {
+    const phase = document.getElementById(`phase-${i}`);
+    const badge = document.getElementById(`badge-${i}`);
+    const phaseTasks = phase.querySelectorAll('.task');
+    const phaseDone = phase.querySelectorAll('.task.done');
+
+    phase.classList.remove('active', 'complete');
+    badge.className = 'phase-badge';
+
+    if (phaseDone.length === phaseTasks.length) {
+      phase.classList.add('complete');
+      badge.classList.add('badge-done');
+      badge.textContent = 'Klaar ✓';
+    } else if (phaseDone.length > 0) {
+      phase.classList.add('active');
+      badge.classList.add('badge-active');
+      badge.textContent = 'Bezig';
+    } else {
+      badge.classList.add('badge-pending');
+      badge.textContent = 'Wachten';
+    }
+  }
+}
+
+function resetAll() {
+  if (confirm('Weet je zeker dat je alle voortgang wilt resetten?')) {
+    localStorage.removeItem(STORAGE_KEY);
+    applyState();
+  }
+}
+
+// Init
+applyState();
+</script>
+
+</body>
+</html>
