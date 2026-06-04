@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SupercoolPayloadGuy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: #f0ece4;
+      min-height: 100vh;
+      color: #1a1a18;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .pg-bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(80,70,50,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80,70,50,0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .pg-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* ── Header ── */
+    .pg-header {
+      padding: 2.5rem 1rem 1.5rem;
+      border-bottom: 2px solid #b8a882;
+      display: flex;
+      align-items: flex-end;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .pg-bolts {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding-bottom: 4px;
+    }
+
+    .panel-screw {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #c8b890;
+      border: 2px solid #8a7a5a;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .panel-screw::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 7px; height: 1.5px;
+      background: #5c4e35;
+    }
+
+    .pg-username {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #7a6a4a;
+      letter-spacing: 0.12em;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .pg-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: #1a1a18;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .pg-subtitle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #7a6a4a;
+      margin-left: auto;
+      letter-spacing: 0.08em;
+      padding-bottom: 4px;
+      white-space: nowrap;
+    }
+
+    /* ── Section labels ── */
+    .pg-section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #7a6a4a;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 2rem 1rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pg-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #b8a882;
+    }
+
+    /* ── Grid ── */
+    .pg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      padding: 0 1rem 0.5rem;
+    }
+
+    .pg-grid--single {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── Cards ── */
+    .pg-card {
+      background: #faf7f0;
+      border: 1.5px solid #b8a882;
+      border-radius: 4px;
+      padding: 1.2rem 1.1rem 1.1rem;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .pg-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: #8a7a5a;
+      transition: background 0.12s ease;
+    }
+
+    .pg-card:hover {
+      border-color: #5c4e35;
+      background: #fff8ec;
+      transform: translateY(-3px);
+    }
+
+    .pg-card:hover::before {
+      background: #c87941;
+    }
+
+    .card-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: #7a6a4a;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .card-icon {
+      font-size: 24px;
+      color: #5c4e35;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .card-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #1a1a18;
+      margin: 0 0 5px;
+      line-height: 1.1;
+    }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: #7a6a4a;
+      margin: 0 0 1.5rem;
+      line-height: 1.45;
+    }
+
+    .card-arrow {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      font-size: 16px;
+      color: #b8a882;
+      transition: color 0.12s ease, transform 0.12s ease;
+    }
+
+    .pg-card:hover .card-arrow {
+      color: #c87941;
+      transform: translateX(3px);
+    }
+
+    /* ── Screws row ── */
+    .screws-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 1.2rem 0.25rem;
+    }
+
+    /* ── Footer ── */
+    .pg-footer {
+      padding: 1rem 1rem 2rem;
+      border-top: 1px solid #b8a882;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #5a8a4a;
+      border: 2px solid #3a6a2a;
+      flex-shrink: 0;
+    }
+
+    .pg-footer span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #7a6a4a;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 500px) {
+      .pg-subtitle { display: none; }
+      .pg-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pg-bg-grid"></div>
+  <div class="pg-wrap">
+
+    <header class="pg-header">
+      <div class="pg-bolts">
+        <div class="panel-screw"></div>
+        <div class="panel-screw"></div>
+      </div>
+      <div>
+        <p class="pg-username">github.com / SupercoolPayloadGuy</p>
+        <h1 class="pg-title">SupercoolPayloadGuy</h1>
+      </div>
+      <span class="pg-subtitle">// personal projects index</span>
+    </header>
+
+    <p class="pg-section-label">01 — tools &amp; machines</p>
+
+    <div class="pg-grid pg-grid--single">
+      <a class="pg-card" href="./typing-machine/">
+        <div class="card-tag">Project_001</div>
+        <i class="ti ti-keyboard card-icon" aria-hidden="true"></i>
+        <p class="card-name">Typing Machine</p>
+        <p class="card-desc">Interactive typewriter planner &amp; layout tool</p>
+        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <p class="pg-section-label">02 — exam planners</p>
+
+    <div class="pg-grid">
+      <a class="pg-card" href="./examen-wiskunde/">
+        <div class="card-tag">Planner_001</div>
+        <i class="ti ti-calculator card-icon" aria-hidden="true"></i>
+        <p class="card-name">Wiskunde</p>
+        <p class="card-desc">Studieplan voor je wiskundetoets</p>
+        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+      </a>
+      <a class="pg-card" href="./examen-chemie/">
+        <div class="card-tag">Planner_002</div>
+        <i class="ti ti-flask card-icon" aria-hidden="true"></i>
+        <p class="card-name">Chemie</p>
+        <p class="card-desc">Studieplan voor je chemietoets</p>
+        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+      </a>
+      <a class="pg-card" href="./examen-engels/">
+        <div class="card-tag">Planner_003</div>
+        <i class="ti ti-world card-icon" aria-hidden="true"></i>
+        <p class="card-name">Engels</p>
+        <p class="card-desc">Studieplan voor je Engelstoets</p>
+        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+      </a>
+      <a class="pg-card" href="./examen-nederlands/">
+        <div class="card-tag">Planner_004</div>
+        <i class="ti ti-book card-icon" aria-hidden="true"></i>
+        <p class="card-name">Nederlands</p>
+        <p class="card-desc">Studieplan voor je Nederlandstoets</p>
+        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <div class="screws-row">
+      <div class="panel-screw"></div>
+      <div class="panel-screw"></div>
+    </div>
+
+    <footer class="pg-footer">
+      <div class="status-dot"></div>
+      <span>System online — SupercoolPayloadGuy.github.io</span>
+    </footer>
+
+  </div>
+</body>
+</html>
