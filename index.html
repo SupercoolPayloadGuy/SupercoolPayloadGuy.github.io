@@ -1,333 +1,397 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SupercoolPayloadGuy</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wiskunde Examen Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:#f0ece4;min-height:100vh;color:#1a1a18;position:relative;overflow-x:hidden}
+.pg-bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(80,70,50,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(80,70,50,.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+.pg-wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 1rem 3rem}
 
-    body {
-      font-family: 'Barlow', sans-serif;
-      background: #f0ece4;
-      min-height: 100vh;
-      color: #1a1a18;
-      position: relative;
-      overflow-x: hidden;
-    }
+.pg-header{padding:2.5rem 1rem 1.5rem;border-bottom:2px solid #b8a882;display:flex;align-items:flex-end;gap:1.5rem;flex-wrap:wrap}
+.pg-bolts{display:flex;gap:6px;align-items:center;padding-bottom:4px}
+.panel-screw{width:14px;height:14px;border-radius:50%;background:#c8b890;border:2px solid #8a7a5a;position:relative;flex-shrink:0}
+.panel-screw::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);width:7px;height:1.5px;background:#5c4e35}
+.pg-username{font-family:'Share Tech Mono',monospace;font-size:11px;color:#7a6a4a;letter-spacing:.12em;margin-bottom:5px;text-transform:uppercase}
+.pg-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,42px);font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1}
+.pg-subtitle{font-family:'Share Tech Mono',monospace;font-size:11px;color:#7a6a4a;margin-left:auto;letter-spacing:.08em;padding-bottom:4px;white-space:nowrap}
 
-    .pg-bg-grid {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(80,70,50,0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(80,70,50,0.08) 1px, transparent 1px);
-      background-size: 32px 32px;
-      pointer-events: none;
-      z-index: 0;
-    }
+.pg-section-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.18em;text-transform:uppercase;padding:1.75rem 1rem .85rem;display:flex;align-items:center;gap:12px}
+.pg-section-label::after{content:'';flex:1;height:1px;background:#b8a882}
 
-    .pg-wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
+/* Progress panel */
+.progress-panel{margin:1.5rem 1rem 0;background:#faf7f0;border:1.5px solid #b8a882;border-radius:4px;padding:1.3rem 1.5rem;position:relative;overflow:hidden}
+.progress-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#c87941}
+.progress-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:1rem;margin-bottom:.9rem}
+.progress-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.progress-meta{font-family:'Share Tech Mono',monospace;font-size:11px;color:#7a6a4a;letter-spacing:.12em}
+.progress-meta b{color:#c87941;font-weight:400}
+.bar{height:14px;background:#ece6d8;border:1.5px solid #b8a882;border-radius:2px;overflow:hidden;position:relative}
+.bar-fill{height:100%;background:repeating-linear-gradient(45deg,#c87941 0 8px,#b86b35 8px 16px);width:0%;transition:width .35s ease}
+.bar-ticks{display:flex;justify-content:space-between;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#7a6a4a;letter-spacing:.12em}
 
-    /* ── Header ── */
-    .pg-header {
-      padding: 2.5rem 1rem 1.5rem;
-      border-bottom: 2px solid #b8a882;
-      display: flex;
-      align-items: flex-end;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
+/* Calendar */
+.calendar{margin:0 1rem;background:#faf7f0;border:1.5px solid #b8a882;border-radius:4px;padding:1.2rem;position:relative;overflow:hidden}
+.calendar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#8a7a5a}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.cal-month{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.cal-month small{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;font-weight:400;margin-left:8px;letter-spacing:.18em}
+.cal-legend{display:flex;gap:14px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#7a6a4a;letter-spacing:.12em;text-transform:uppercase;flex-wrap:wrap}
+.lg{display:inline-flex;align-items:center;gap:5px}
+.lg::before{content:'';width:10px;height:10px;border:1.5px solid #b8a882;border-radius:2px}
+.lg.study::before{background:#faf7f0}
+.lg.rest::before{background:#ece6d8;border-style:dashed}
+.lg.exam::before{background:#fff8ec;border-color:#c87941}
+.lg.done::before{background:#5a8a4a;border-color:#3a6a2a}
 
-    .pg-bolts {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      padding-bottom: 4px;
-    }
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.15em;text-align:center;padding:6px 0;text-transform:uppercase}
+.cal-cell{aspect-ratio:1;background:#fff;border:1.5px solid #b8a882;border-radius:3px;padding:6px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .12s ease,border-color .12s ease,background .12s ease;position:relative;font-family:'Barlow Condensed',sans-serif}
+.cal-cell:hover{transform:translateY(-2px);border-color:#5c4e35;background:#fff8ec}
+.cal-cell.empty{background:transparent;border:1.5px dashed #d6cdb6;cursor:default}
+.cal-cell.empty:hover{transform:none;background:transparent;border-color:#d6cdb6}
+.cal-cell.rest{background:#ece6d8;border-style:dashed}
+.cal-cell.exam{background:#fff8ec;border-color:#c87941;border-width:2px}
+.cal-cell.exam::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:4px;background:#c87941;border-radius:2px 2px 0 0}
+.cal-cell.active{outline:2px solid #c87941;outline-offset:2px}
+.cal-cell.done{background:#5a8a4a;border-color:#3a6a2a;color:#fff}
+.cal-cell.done .cal-num,.cal-cell.done .cal-tag{color:#fff}
+.cal-num{font-size:20px;font-weight:700;line-height:1}
+.cal-tag{font-family:'Share Tech Mono',monospace;font-size:8px;color:#7a6a4a;letter-spacing:.1em;text-transform:uppercase;line-height:1.2}
+.cal-dot{position:absolute;bottom:5px;right:6px;width:6px;height:6px;border-radius:50%;background:#c87941;display:none}
+.cal-cell.has-progress .cal-dot{display:block}
 
-    .panel-screw {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #c8b890;
-      border: 2px solid #8a7a5a;
-      position: relative;
-      flex-shrink: 0;
-    }
+/* Detail panel */
+.detail{margin:1rem 1rem 0;background:#faf7f0;border:1.5px solid #b8a882;border-radius:4px;padding:1.4rem 1.5rem;position:relative;overflow:hidden;min-height:200px}
+.detail::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#8a7a5a}
+.detail.exam-day::before{background:#c87941}
+.detail-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem;padding-bottom:.75rem;border-bottom:1px dashed #b8a882;margin-bottom:1rem}
+.detail-date{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.detail-date small{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;font-weight:400;margin-left:10px;letter-spacing:.18em}
+.detail-tag{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.15em;text-transform:uppercase}
+.detail-topic{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:#5c4e35;margin-bottom:.4rem}
+.detail-chapters{margin-bottom:1rem}
+.chapter-pill{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:9px;background:#ece6d8;color:#5c4e35;padding:3px 8px;border-radius:2px;letter-spacing:.12em;margin-right:6px;margin-bottom:4px;border:1px solid #b8a882}
+.criteria{list-style:none;display:flex;flex-direction:column;gap:8px}
+.criteria li{display:flex;gap:11px;align-items:flex-start;padding:9px 11px;background:#fff;border:1.5px solid #ece6d8;border-radius:3px;cursor:pointer;transition:border-color .12s ease,background .12s ease}
+.criteria li:hover{border-color:#b8a882;background:#fff8ec}
+.criteria li.checked{background:#ece6d8;border-color:#b8a882}
+.criteria li.checked .crit-text{text-decoration:line-through;color:#7a6a4a}
+.cbox{width:18px;height:18px;border:1.5px solid #8a7a5a;border-radius:2px;background:#fff;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background .12s ease,border-color .12s ease}
+.criteria li.checked .cbox{background:#5a8a4a;border-color:#3a6a2a}
+.cbox i{font-size:14px;color:#fff;opacity:0;transition:opacity .12s ease}
+.criteria li.checked .cbox i{opacity:1}
+.crit-text{font-size:13.5px;color:#3a352a;line-height:1.45;flex:1}
+.detail-empty{text-align:center;padding:2rem 1rem;color:#7a6a4a;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.12em}
 
-    .panel-screw::after {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      width: 7px; height: 1.5px;
-      background: #5c4e35;
-    }
+.pg-footer{padding:1.5rem 1rem 0;border-top:1px solid #b8a882;margin-top:2rem;display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.pg-footer-l{display:flex;align-items:center;gap:8px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#5a8a4a;border:2px solid #3a6a2a;flex-shrink:0}
+.pg-footer span{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.1em}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;background:none;border:1px solid #b8a882;border-radius:2px;padding:5px 10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.reset-btn:hover{color:#c87941;border-color:#c87941}
 
-    .pg-username {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: #7a6a4a;
-      letter-spacing: 0.12em;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-    }
-
-    .pg-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(28px, 5vw, 42px);
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      color: #1a1a18;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-
-    .pg-subtitle {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      color: #7a6a4a;
-      margin-left: auto;
-      letter-spacing: 0.08em;
-      padding-bottom: 4px;
-      white-space: nowrap;
-    }
-
-    /* ── Section labels ── */
-    .pg-section-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: #7a6a4a;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      padding: 2rem 1rem 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .pg-section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #b8a882;
-    }
-
-    /* ── Grid ── */
-    .pg-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-      padding: 0 1rem 0.5rem;
-    }
-
-    .pg-grid--single {
-      grid-template-columns: 1fr;
-    }
-
-    /* ── Cards ── */
-    .pg-card {
-      background: #faf7f0;
-      border: 1.5px solid #b8a882;
-      border-radius: 4px;
-      padding: 1.2rem 1.1rem 1.1rem;
-      cursor: pointer;
-      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
-      position: relative;
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-
-    .pg-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: #8a7a5a;
-      transition: background 0.12s ease;
-    }
-
-    .pg-card:hover {
-      border-color: #5c4e35;
-      background: #fff8ec;
-      transform: translateY(-3px);
-    }
-
-    .pg-card:hover::before {
-      background: #c87941;
-    }
-
-    .card-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      color: #7a6a4a;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .card-icon {
-      font-size: 24px;
-      color: #5c4e35;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .card-name {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #1a1a18;
-      margin: 0 0 5px;
-      line-height: 1.1;
-    }
-
-    .card-desc {
-      font-size: 12.5px;
-      color: #7a6a4a;
-      margin: 0 0 1.5rem;
-      line-height: 1.45;
-    }
-
-    .card-arrow {
-      position: absolute;
-      bottom: 12px;
-      right: 14px;
-      font-size: 16px;
-      color: #b8a882;
-      transition: color 0.12s ease, transform 0.12s ease;
-    }
-
-    .pg-card:hover .card-arrow {
-      color: #c87941;
-      transform: translateX(3px);
-    }
-
-    /* ── Screws row ── */
-    .screws-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.75rem 1.2rem 0.25rem;
-    }
-
-    /* ── Footer ── */
-    .pg-footer {
-      padding: 1rem 1rem 2rem;
-      border-top: 1px solid #b8a882;
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #5a8a4a;
-      border: 2px solid #3a6a2a;
-      flex-shrink: 0;
-    }
-
-    .pg-footer span {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      color: #7a6a4a;
-      letter-spacing: 0.1em;
-    }
-
-    @media (max-width: 500px) {
-      .pg-subtitle { display: none; }
-      .pg-grid { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
+@media (max-width:560px){
+  .cal-cell{padding:4px}
+  .cal-num{font-size:15px}
+  .cal-tag{font-size:7px}
+}
+</style>
 </head>
 <body>
-  <div class="pg-bg-grid"></div>
-  <div class="pg-wrap">
+<div class="pg-bg-grid"></div>
+<div class="pg-wrap">
 
-    <header class="pg-header">
-      <div class="pg-bolts">
-        <div class="panel-screw"></div>
-        <div class="panel-screw"></div>
+  <header class="pg-header">
+    <div class="pg-bolts"><span class="panel-screw"></span><span class="panel-screw"></span></div>
+    <div>
+      <div class="pg-username">// exam planner v2 — interactive</div>
+      <h1 class="pg-title">Wiskunde</h1>
+    </div>
+    <div class="pg-subtitle">EXAM_TARGET: 2026-06-17</div>
+  </header>
+
+  <section class="progress-panel">
+    <div class="progress-head">
+      <div class="progress-title">Voortgang</div>
+      <div class="progress-meta"><span id="pct">0%</span> · <b id="done">0</b> / <span id="total">0</span> criteria voltooid</div>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+    <div class="bar-ticks"><span>START</span><span>25%</span><span>50%</span><span>75%</span><span>EXAM</span></div>
+  </section>
+
+  <div class="pg-section-label">01 — kalender · juni 2026</div>
+
+  <section class="calendar">
+    <div class="cal-head">
+      <div class="cal-month">Juni 2026<small>13 DAGEN TE GAAN</small></div>
+      <div class="cal-legend">
+        <span class="lg study">studie</span>
+        <span class="lg rest">vrij</span>
+        <span class="lg exam">examen</span>
+        <span class="lg done">af</span>
       </div>
-      <div>
-        <p class="pg-username">github.com / SupercoolPayloadGuy</p>
-        <h1 class="pg-title">SupercoolPayloadGuy</h1>
-      </div>
-      <span class="pg-subtitle">// personal projects index</span>
-    </header>
-
-    <p class="pg-section-label">01 — tools &amp; machines</p>
-
-    <div class="pg-grid pg-grid--single">
-      <a class="pg-card" href="./typing-machine/">
-        <div class="card-tag">Project_001</div>
-        <i class="ti ti-keyboard card-icon" aria-hidden="true"></i>
-        <p class="card-name">Typing Machine</p>
-        <p class="card-desc">Interactive typewriter planner &amp; layout tool</p>
-        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
-      </a>
     </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </section>
 
-    <p class="pg-section-label">02 — exam planners</p>
+  <div class="pg-section-label">02 — dagdetail</div>
+  <section class="detail" id="detail">
+    <div class="detail-empty">// klik op een dag in de kalender</div>
+  </section>
 
-    <div class="pg-grid">
-      <a class="pg-card" href="./examen-wiskunde/">
-        <div class="card-tag">Planner_001</div>
-        <i class="ti ti-calculator card-icon" aria-hidden="true"></i>
-        <p class="card-name">Wiskunde</p>
-        <p class="card-desc">Studieplan voor je wiskundetoets</p>
-        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
-      </a>
-      <a class="pg-card" href="./examen-chemie/">
-        <div class="card-tag">Planner_002</div>
-        <i class="ti ti-flask card-icon" aria-hidden="true"></i>
-        <p class="card-name">Chemie</p>
-        <p class="card-desc">Studieplan voor je chemietoets</p>
-        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
-      </a>
-      <a class="pg-card" href="./examen-engels/">
-        <div class="card-tag">Planner_003</div>
-        <i class="ti ti-world card-icon" aria-hidden="true"></i>
-        <p class="card-name">Engels</p>
-        <p class="card-desc">Studieplan voor je Engelstoets</p>
-        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
-      </a>
-      <a class="pg-card" href="./examen-nederlands/">
-        <div class="card-tag">Planner_004</div>
-        <i class="ti ti-book card-icon" aria-hidden="true"></i>
-        <p class="card-name">Nederlands</p>
-        <p class="card-desc">Studieplan voor je Nederlandstoets</p>
-        <i class="ti ti-arrow-right card-arrow" aria-hidden="true"></i>
-      </a>
+  <footer class="pg-footer">
+    <div class="pg-footer-l">
+      <span class="status-dot"></span>
+      <span>System online — voortgang opgeslagen in browser</span>
     </div>
+    <button class="reset-btn" id="resetBtn"><i class="ti ti-refresh"></i> reset alles</button>
+  </footer>
+</div>
 
-    <div class="screws-row">
-      <div class="panel-screw"></div>
-      <div class="panel-screw"></div>
+<script>
+const PLAN = {
+  '2026-06-04': {tag:'DAG 1 · START', topic:'Hoofdstuk 6 — Basisbegrippen functies (deel 1)', chapters:['CH 6'], items:[
+    'Theorie: recht/omgekeerd evenredige grootheden + soorten verbanden',
+    'Voorstellingswijzen: verwoording, tabel, grafiek, voorschrift + verbanden leggen',
+    'Onafhankelijke vs afhankelijke variabele',
+    'Bepalen of een grafiek/verwoording een functie is',
+    'Voorschrift opstellen + tabel opstellen + grafiek tekenen',
+    "Lesvideo's + presentaties bekijken"
+  ]},
+  '2026-06-05': {tag:'DAG 2 · VRIJ', topic:'Vrije dag — geen studie', rest:true, items:[]},
+  '2026-06-06': {tag:'DAG 3 · THEORIE', topic:'Hoofdstuk 6 — Basisbegrippen functies (deel 2)', chapters:['CH 6'], items:[
+    'Functievoorschrift, invoer- en functiewaarde (aflezen + berekenen)',
+    'Domein, bereik, nulwaarde, nulpunt (aflezen + berekenen)',
+    'Tekentabel + tekenverloop opstellen, grafiek tekenen bij tekenverloop',
+    'Extrema bepalen, stijgen/dalen/constant onderzoeken, verloopschema opstellen',
+    'Symmetrie t.o.v. oorsprong of verticale rechte onderzoeken',
+    'Oefeningen maken + definities memoriseren'
+  ]},
+  '2026-06-07': {tag:'DAG 4 · THEORIE', topic:'Hoofdstuk 7 — Eerstegraadsfuncties (deel 1)', chapters:['CH 7'], items:[
+    'Definitie lineaire functie + eerstegraadsfunctie + voorschrift herkennen',
+    'Richtingscoëfficiënt aflezen + berekenen',
+    'Snijpunten met x-as en y-as aflezen + berekenen',
+    'Verloop (stijgend/dalend) bepalen via richtingscoëfficiënt',
+    'Tabel + grafiek bij gegeven voorschrift, tekentabel opstellen',
+    'Bepalen of een punt op de grafiek ligt via voorschrift'
+  ]},
+  '2026-06-08': {tag:'DAG 5 · THEORIE', topic:'Hoofdstuk 7 — Eerstegraadsfuncties (deel 2)', chapters:['CH 7'], items:[
+    'Voorschrift opstellen via grafiek / tabel / verwoording',
+    'Voorschrift met gegeven rico + punt',
+    'Voorschrift door twee gegeven punten',
+    'Constante functies: herkennen, snijpunten, tekentabel, voorschrift opstellen',
+    'Grafieken tekenen in GeoGebra (A4)',
+    'Vraagstukken met eerstegraadsfuncties oplossen'
+  ]},
+  '2026-06-09': {tag:'DAG 6 · ALGEBRA', topic:'Hoofdstuk 7 vergelijkingen/ongelijkheden + Hoofdstuk 11', chapters:['CH 7','CH 11'], items:[
+    'Eerstegraadsvergelijking met één onbekende oplossen',
+    'Eerstegraadsongelijkheid algebraïsch oplossen',
+    'Eerstegraadsongelijkheid grafisch oplossen',
+    'Vergelijking grafisch oplossen via snijpunt',
+    'Ongelijkheid oplossen via tekenverloop',
+    'Vraagstuk met eerstegraadsfunctie / ongelijkheid',
+    'CH 11: ontbinden — gemeenschappelijke factor afzonderen',
+    'CH 11: ontbinden via merkwaardige producten',
+    'CH 11: ontbinden via termen samennemen',
+    'Z-route: som/verschil van twee derdemachten + x²+(a+b)x+ab'
+  ]},
+  '2026-06-10': {tag:'DAG 7 · MEETKUNDE', topic:'Hoofdstuk 9 — Stelling van Pythagoras', chapters:['CH 9'], items:[
+    'Kwadraten + vierkantswortels van reële getallen berekenen',
+    'Stelling van Pythagoras in woorden + symbolen + bewijs studeren',
+    'Toepassing: zijde berekenen in rechthoekige driehoek',
+    'Meetkundige problemen oplossen met Pythagoras',
+    '√n construeren op de getallenas',
+    'Omgekeerde stelling: aantonen dat driehoek rechthoekig is',
+    'Afstandsformule tussen twee punten in het vlak',
+    'Pythagoras in ruimtelichaam: ruimtediagonaal berekenen',
+    'Hoogte van een piramide berekenen'
+  ]},
+  '2026-06-11': {tag:'DAG 8 · MEETKUNDE', topic:'Hoofdstuk 5.6 Thales + 9.1 Metrische betrekkingen (NW/Z)', chapters:['CH 5.6','CH 9.1'], items:[
+    'Evenwijdige projectie van punt, lijnstuk en rechte op een rechte tekenen',
+    'Beeld van projectie aflezen op tekening',
+    'Bewijs stelling van Thales',
+    'Metr. betr.: begrippen + eigenschappen in woorden & symbolen',
+    'Bewijs van de eigenschappen i.v.m. metrische betrekkingen',
+    'Toepassingen metrische betrekkingen in rechthoekige driehoeken'
+  ]},
+  '2026-06-12': {tag:'DAG 9 · VRIJ', topic:'Vrije dag — geen studie', rest:true, items:[]},
+  '2026-06-13': {tag:'DAG 10 · GONIOMETRIE', topic:'Hoofdstuk 10 — Goniometrie (deel 1)', chapters:['CH 10'], items:[
+    'Sin/cos/tan van scherpe hoek in rechthoekige driehoek definiëren',
+    'Goniometrisch getal noteren als verhouding van zijden',
+    'Rechthoekige driehoek construeren bij gegeven gon. getal',
+    'Goniometrische getallen berekenen met RM / ICT',
+    'Verband sin/cos van complementaire hoeken',
+    'Hoekgrootte berekenen bij gegeven goniometrisch getal'
+  ]},
+  '2026-06-14': {tag:'DAG 11 · GONIO + MEETK.', topic:'Hoofdstuk 10 (deel 2) + Hoofdstuk 12', chapters:['CH 10','CH 12'], items:[
+    'Grondformule goniometrie + verband sin/cos/tan in symbolen',
+    'Bewijs grondformule + verband sin/cos/tan',
+    'Zijden en hoeken berekenen in rechthoekige driehoek',
+    'Zijden en hoeken berekenen in ruimtefiguren',
+    'CH 12: definitie + tekenen + herkennen van 4 merkwaardige lijnen',
+    'Omgeschreven cirkel construeren (passer + GeoGebra)',
+    'Ingeschreven cirkel construeren (passer + GeoGebra)',
+    'Zwaartelijnen tekenen + zwaartepunt bepalen',
+    'Eigenschap zwaartelijnen in woorden & symbolen + toepassen',
+    'Combi-oefening: zwaartelijnen + Pythagoras + gelijkvormigheid + metr. betr.'
+  ]},
+  '2026-06-15': {tag:'DAG 12 · HERHALING', topic:'Volledige herhaling + oefentoets', chapters:['ALL'], items:[
+    'Alle definities overhoren (functies, eerstegraads, Pythagoras, gonio, merkw. lijnen)',
+    'Gemengde oefenreeks: 2 oefeningen per hoofdstuk',
+    'Vraagstukken (eerstegraadsfuncties + Pythagoras + gonio)',
+    'GeoGebra-handelingen herhalen',
+    'Zwakke punten noteren voor morgen'
+  ]},
+  '2026-06-16': {tag:'DAG 13 · FINALE', topic:'Bewijzen + zwakke punten — laatste check', chapters:['FOCUS'], items:[
+    'Bewijs Thales opnieuw schrijven',
+    'Bewijs Pythagoras opnieuw schrijven',
+    'Bewijs metrische betrekkingen opnieuw schrijven',
+    'Bewijs grondformule goniometrie opnieuw schrijven',
+    'Zwakke punten van gisteren bijwerken',
+    'Flashcards: rico, domein/bereik, gonio-verhoudingen, merkw. lijnen',
+    'Materiaal klaarleggen: RM, geodriehoek, passer, potlood, GeoGebra-toegang',
+    'Vroeg slapen'
+  ]},
+  '2026-06-17': {tag:'EXAM DAY · GO TIME', topic:'Examen Wiskunde', exam:true, chapters:['EXAM'], items:[
+    'Goed ontbijten',
+    'Materiaal nakijken vóór vertrek',
+    'Diep ademhalen — je bent klaar'
+  ]},
+};
+
+const STORAGE_KEY = 'wisk-planner-v2';
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function totalCounts(){
+  let total=0, done=0;
+  for (const [k,d] of Object.entries(PLAN)){
+    total += d.items.length;
+    const s = state[k] || [];
+    done += s.filter(Boolean).length;
+  }
+  return {total, done};
+}
+
+function dayProgress(k){
+  const d = PLAN[k]; if(!d || !d.items.length) return {done:0,total:0,complete:false};
+  const s = state[k] || [];
+  const done = s.filter(Boolean).length;
+  return {done, total:d.items.length, complete: done === d.items.length};
+}
+
+function renderProgress(){
+  const {total, done} = totalCounts();
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('done').textContent = done;
+  document.getElementById('total').textContent = total;
+  document.getElementById('barFill').style.width = pct + '%';
+}
+
+function renderCalendar(){
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  const dows = ['MA','DI','WO','DO','VR','ZA','ZO'];
+  dows.forEach(d => { const el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+
+  // June 2026: June 1 is a Monday
+  const firstDow = 0; // Monday = 0 in our grid
+  for (let i=0;i<firstDow;i++){ const e=document.createElement('div'); e.className='cal-cell empty'; grid.appendChild(e); }
+
+  for (let day=1; day<=30; day++){
+    const dd = String(day).padStart(2,'0');
+    const key = `2026-06-${dd}`;
+    const plan = PLAN[key];
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    cell.dataset.key = key;
+    let tagText = '';
+    if (plan){
+      if (plan.exam){ cell.classList.add('exam'); tagText='EXAM'; }
+      else if (plan.rest){ cell.classList.add('rest'); tagText='VRIJ'; }
+      else {
+        const p = dayProgress(key);
+        if (p.complete) cell.classList.add('done');
+        else if (p.done>0) cell.classList.add('has-progress');
+        tagText = p.total ? `${p.done}/${p.total}` : '';
+      }
+    }
+    cell.innerHTML = `<div class="cal-num">${day}</div><div class="cal-tag">${tagText}</div><div class="cal-dot"></div>`;
+    if (plan) cell.addEventListener('click', ()=> selectDay(key));
+    else cell.style.cursor='default';
+    grid.appendChild(cell);
+  }
+}
+
+let activeKey = null;
+function selectDay(key){
+  activeKey = key;
+  document.querySelectorAll('.cal-cell').forEach(c => c.classList.toggle('active', c.dataset.key === key));
+  renderDetail();
+}
+
+function renderDetail(){
+  const detail = document.getElementById('detail');
+  if (!activeKey){ detail.innerHTML='<div class="detail-empty">// klik op een dag in de kalender</div>'; return; }
+  const d = PLAN[activeKey];
+  const dt = new Date(activeKey+'T00:00');
+  const dows = ['ZO','MA','DI','WO','DO','VR','ZA'];
+  const months = ['JAN','FEB','MAA','APR','MEI','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
+  const label = `${dows[dt.getDay()]} ${String(dt.getDate()).padStart(2,'0')} ${months[dt.getMonth()]}`;
+  detail.className = 'detail' + (d.exam ? ' exam-day' : '');
+  const chapters = (d.chapters||[]).map(c=>`<span class="chapter-pill">${c}</span>`).join('');
+  const s = state[activeKey] || [];
+  const items = d.items.map((t,i)=>`<li data-i="${i}" class="${s[i]?'checked':''}"><div class="cbox"><i class="ti ti-check"></i></div><div class="crit-text">${t}</div></li>`).join('');
+  detail.innerHTML = `
+    <div class="detail-head">
+      <div class="detail-date">${label}<small>${d.tag}</small></div>
+      <div class="detail-tag">${d.items.length} criteria</div>
     </div>
+    <div class="detail-topic">${d.topic}</div>
+    <div class="detail-chapters">${chapters}</div>
+    ${d.items.length ? `<ul class="criteria">${items}</ul>` : '<div class="detail-empty">// rustdag · niets te doen</div>'}
+  `;
+  detail.querySelectorAll('.criteria li').forEach(li => {
+    li.addEventListener('click', ()=>{
+      const i = +li.dataset.i;
+      const arr = state[activeKey] || new Array(d.items.length).fill(false);
+      arr[i] = !arr[i];
+      state[activeKey] = arr;
+      save();
+      li.classList.toggle('checked');
+      renderProgress();
+      // update calendar cell tag/state
+      const cell = document.querySelector(`.cal-cell[data-key="${activeKey}"]`);
+      if (cell){
+        const p = dayProgress(activeKey);
+        cell.classList.toggle('done', p.complete);
+        cell.classList.toggle('has-progress', p.done>0 && !p.complete);
+        cell.querySelector('.cal-tag').textContent = `${p.done}/${p.total}`;
+      }
+    });
+  });
+}
 
-    <footer class="pg-footer">
-      <div class="status-dot"></div>
-      <span>System online — SupercoolPayloadGuy.github.io</span>
-    </footer>
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if (!confirm('Alle voortgang wissen?')) return;
+  state = {}; save(); renderCalendar(); renderProgress(); if(activeKey) renderDetail();
+});
 
-  </div>
+renderCalendar();
+renderProgress();
+// auto-select today if in range, else first study day
+const today = new Date(); const todayKey = `2026-06-${String(today.getDate()).padStart(2,'0')}`;
+if (today.getFullYear()===2026 && today.getMonth()===5 && PLAN[todayKey]) selectDay(todayKey);
+else selectDay('2026-06-04');
+</script>
 </body>
 </html>
