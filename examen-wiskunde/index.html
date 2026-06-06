@@ -1,397 +1,1428 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Wiskunde Examen Planner</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circle Construction</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Barlow',sans-serif;background:#f0ece4;min-height:100vh;color:#1a1a18;position:relative;overflow-x:hidden}
-.pg-bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(80,70,50,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(80,70,50,.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
-.pg-wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 1rem 3rem}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:monospace}
 
-.pg-header{padding:2.5rem 1rem 1.5rem;border-bottom:2px solid #b8a882;display:flex;align-items:flex-end;gap:1.5rem;flex-wrap:wrap}
-.pg-bolts{display:flex;gap:6px;align-items:center;padding-bottom:4px}
-.panel-screw{width:14px;height:14px;border-radius:50%;background:#c8b890;border:2px solid #8a7a5a;position:relative;flex-shrink:0}
-.panel-screw::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);width:7px;height:1.5px;background:#5c4e35}
-.pg-username{font-family:'Share Tech Mono',monospace;font-size:11px;color:#7a6a4a;letter-spacing:.12em;margin-bottom:5px;text-transform:uppercase}
-.pg-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,42px);font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1}
-.pg-subtitle{font-family:'Share Tech Mono',monospace;font-size:11px;color:#7a6a4a;margin-left:auto;letter-spacing:.08em;padding-bottom:4px;white-space:nowrap}
+body{display:flex;flex-direction:column;
+     background:#0a0a0a;color:#ccc;
+     transition:background .25s}
 
-.pg-section-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.18em;text-transform:uppercase;padding:1.75rem 1rem .85rem;display:flex;align-items:center;gap:12px}
-.pg-section-label::after{content:'';flex:1;height:1px;background:#b8a882}
+#canvas-wrap{flex:1;position:relative;overflow:hidden}
+#canvas-wrap canvas{display:block;width:100%;height:100%}
 
-/* Progress panel */
-.progress-panel{margin:1.5rem 1rem 0;background:#faf7f0;border:1.5px solid #b8a882;border-radius:4px;padding:1.3rem 1.5rem;position:relative;overflow:hidden}
-.progress-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#c87941}
-.progress-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:1rem;margin-bottom:.9rem}
-.progress-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.progress-meta{font-family:'Share Tech Mono',monospace;font-size:11px;color:#7a6a4a;letter-spacing:.12em}
-.progress-meta b{color:#c87941;font-weight:400}
-.bar{height:14px;background:#ece6d8;border:1.5px solid #b8a882;border-radius:2px;overflow:hidden;position:relative}
-.bar-fill{height:100%;background:repeating-linear-gradient(45deg,#c87941 0 8px,#b86b35 8px 16px);width:0%;transition:width .35s ease}
-.bar-ticks{display:flex;justify-content:space-between;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#7a6a4a;letter-spacing:.12em}
+/* ── INTRO OVERLAY ── */
+#intro{position:absolute;top:0;left:0;width:100%;height:100%;
+       display:flex;flex-direction:column;align-items:center;
+       justify-content:center;pointer-events:none}
+#intro > *{pointer-events:auto}
+.intro-title{font-size:42px;font-weight:bold;color:#d7d7d7;
+             letter-spacing:3px;margin-bottom:2px}
+.intro-sub{font-size:16px;color:#5f5f5f;margin-bottom:32px}
+.intro-level{font-size:76px;font-weight:bold;line-height:1}
+.intro-name{font-size:21px;margin-top:8px;margin-bottom:10px}
+.intro-pts{font-size:14px;color:#8c8c8c;margin-bottom:24px}
+.intro-pts .hl{color:#ffc832}
+.intro-type{font-size:14px;color:#5f5f5f;margin-bottom:18px}
+.intro-type .act{color:#ffc832}
+.intro-bar-wrap{width:260px;height:4px;background:#1e1e1e;
+                border-radius:2px;overflow:hidden;margin-bottom:14px}
+.intro-bar-fill{height:100%;border-radius:2px;transition:width .15s}
+.intro-enter{font-size:14px;color:#5f5f5f;margin-bottom:22px}
+.intro-dots{display:flex;gap:14px;align-items:center}
+.intro-dot{width:7px;height:7px;border-radius:50%;background:#1e1e1e;
+           transition:background .15s}
+.intro-dot.act{background:#ffc832}
+.intro-dots-extra{font-size:14px;color:rgb(80,200,255);margin-left:4px}
 
-/* Calendar */
-.calendar{margin:0 1rem;background:#faf7f0;border:1.5px solid #b8a882;border-radius:4px;padding:1.2rem;position:relative;overflow:hidden}
-.calendar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#8a7a5a}
-.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-.cal-month{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.cal-month small{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;font-weight:400;margin-left:8px;letter-spacing:.18em}
-.cal-legend{display:flex;gap:14px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#7a6a4a;letter-spacing:.12em;text-transform:uppercase;flex-wrap:wrap}
-.lg{display:inline-flex;align-items:center;gap:5px}
-.lg::before{content:'';width:10px;height:10px;border:1.5px solid #b8a882;border-radius:2px}
-.lg.study::before{background:#faf7f0}
-.lg.rest::before{background:#ece6d8;border-style:dashed}
-.lg.exam::before{background:#fff8ec;border-color:#c87941}
-.lg.done::before{background:#5a8a4a;border-color:#3a6a2a}
+/* ── BOTTOM UI BAR ── */
+#ui{display:flex;align-items:center;gap:16px;padding:10px 20px;
+    background:#1a1a1a;border-top:1px solid #333;
+    flex-wrap:wrap;user-select:none;
+    transition:background .25s,border-color .25s}
+#ui label{font-size:13px;color:#888;transition:color .25s}
+#ui input[type=range]{width:80px;accent-color:#ffc832}
+#ui .val{font-size:13px;color:#ffc832;min-width:20px;text-align:center}
+#ui button{padding:6px 16px;font:13px monospace;background:#2a2a2a;
+           color:#ccc;border:1px solid #555;border-radius:6px;
+           cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+#ui button:hover{background:#3a3a3a;color:#ffc832;border-color:#ffc832}
+#ui button.prim{background:#ffc832;color:#111;border-color:#ffc832;font-weight:bold}
+#ui button.prim:hover{background:#ffd966}
+#ui .sep{width:1px;height:24px;background:#444;transition:background .25s}
+#zoom-display{font-size:13px;color:#888;min-width:70px;text-align:center}
+#zoom-display .hl{color:#ffc832}
 
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.cal-dow{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.15em;text-align:center;padding:6px 0;text-transform:uppercase}
-.cal-cell{aspect-ratio:1;background:#fff;border:1.5px solid #b8a882;border-radius:3px;padding:6px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .12s ease,border-color .12s ease,background .12s ease;position:relative;font-family:'Barlow Condensed',sans-serif}
-.cal-cell:hover{transform:translateY(-2px);border-color:#5c4e35;background:#fff8ec}
-.cal-cell.empty{background:transparent;border:1.5px dashed #d6cdb6;cursor:default}
-.cal-cell.empty:hover{transform:none;background:transparent;border-color:#d6cdb6}
-.cal-cell.rest{background:#ece6d8;border-style:dashed}
-.cal-cell.exam{background:#fff8ec;border-color:#c87941;border-width:2px}
-.cal-cell.exam::before{content:'';position:absolute;top:-1px;left:-1px;right:-1px;height:4px;background:#c87941;border-radius:2px 2px 0 0}
-.cal-cell.active{outline:2px solid #c87941;outline-offset:2px}
-.cal-cell.done{background:#5a8a4a;border-color:#3a6a2a;color:#fff}
-.cal-cell.done .cal-num,.cal-cell.done .cal-tag{color:#fff}
-.cal-num{font-size:20px;font-weight:700;line-height:1}
-.cal-tag{font-family:'Share Tech Mono',monospace;font-size:8px;color:#7a6a4a;letter-spacing:.1em;text-transform:uppercase;line-height:1.2}
-.cal-dot{position:absolute;bottom:5px;right:6px;width:6px;height:6px;border-radius:50%;background:#c87941;display:none}
-.cal-cell.has-progress .cal-dot{display:block}
+#theme-btn{position:absolute;top:12px;right:12px;padding:5px 14px;
+           font:12px monospace;background:#191919;color:#b4b4b4;
+           border:1px solid #444;border-radius:6px;cursor:pointer;z-index:10;
+           transition:background .25s,color .25s,border-color .25s}
+#theme-btn:hover{color:#ffc832;border-color:#ffc832}
 
-/* Detail panel */
-.detail{margin:1rem 1rem 0;background:#faf7f0;border:1.5px solid #b8a882;border-radius:4px;padding:1.4rem 1.5rem;position:relative;overflow:hidden;min-height:200px}
-.detail::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#8a7a5a}
-.detail.exam-day::before{background:#c87941}
-.detail-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem;padding-bottom:.75rem;border-bottom:1px dashed #b8a882;margin-bottom:1rem}
-.detail-date{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.detail-date small{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;font-weight:400;margin-left:10px;letter-spacing:.18em}
-.detail-tag{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.15em;text-transform:uppercase}
-.detail-topic{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:#5c4e35;margin-bottom:.4rem}
-.detail-chapters{margin-bottom:1rem}
-.chapter-pill{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:9px;background:#ece6d8;color:#5c4e35;padding:3px 8px;border-radius:2px;letter-spacing:.12em;margin-right:6px;margin-bottom:4px;border:1px solid #b8a882}
-.criteria{list-style:none;display:flex;flex-direction:column;gap:8px}
-.criteria li{display:flex;gap:11px;align-items:flex-start;padding:9px 11px;background:#fff;border:1.5px solid #ece6d8;border-radius:3px;cursor:pointer;transition:border-color .12s ease,background .12s ease}
-.criteria li:hover{border-color:#b8a882;background:#fff8ec}
-.criteria li.checked{background:#ece6d8;border-color:#b8a882}
-.criteria li.checked .crit-text{text-decoration:line-through;color:#7a6a4a}
-.cbox{width:18px;height:18px;border:1.5px solid #8a7a5a;border-radius:2px;background:#fff;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:background .12s ease,border-color .12s ease}
-.criteria li.checked .cbox{background:#5a8a4a;border-color:#3a6a2a}
-.cbox i{font-size:14px;color:#fff;opacity:0;transition:opacity .12s ease}
-.criteria li.checked .cbox i{opacity:1}
-.crit-text{font-size:13.5px;color:#3a352a;line-height:1.45;flex:1}
-.detail-empty{text-align:center;padding:2rem 1rem;color:#7a6a4a;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.12em}
+/* ── COMPLETION OVERLAY ── */
+#complete-overlay{position:absolute;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.72);display:none;flex-direction:column;
+  align-items:center;justify-content:center;z-index:20;pointer-events:none}
+#complete-overlay>*{pointer-events:auto}
+.complete-title{font-size:22px;font-weight:bold;color:#ffc832;margin-bottom:28px;
+  letter-spacing:2px}
+.complete-actions{display:flex;gap:18px}
+.complete-actions button{padding:10px 26px;font:15px monospace;font-weight:bold;
+  background:#2a2a2a;color:#ccc;border:1px solid #666;border-radius:8px;
+  cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.complete-actions button:hover{background:#3a3a3a;color:#ffc832;border-color:#ffc832}
+#choice-look-btn{background:#1a3a2a;border-color:#2a6a4a;color:#8f8}
+#choice-look-btn:hover{background:#2a5a3a;color:#afa;border-color:#4a9a6a}
+#menu-btn{display:none}
 
-.pg-footer{padding:1.5rem 1rem 0;border-top:1px solid #b8a882;margin-top:2rem;display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
-.pg-footer-l{display:flex;align-items:center;gap:8px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#5a8a4a;border:2px solid #3a6a2a;flex-shrink:0}
-.pg-footer span{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;letter-spacing:.1em}
-.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;color:#7a6a4a;background:none;border:1px solid #b8a882;border-radius:2px;padding:5px 10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
-.reset-btn:hover{color:#c87941;border-color:#c87941}
+/* ── LIGHT MODE ── */
+body.light{background:#f5f0eb;color:#555}
+body.light #ui{background:#e6e0d8;border-color:#ccc}
+body.light #ui label{color:#888}
+body.light #ui button{background:#ddd8d0;color:#444;border-color:#bbb}
+body.light #ui button:hover{background:#d0cac0;color:#333;border-color:#a80}
+body.light #ui button.prim{background:#c90;color:#fff;border-color:#c90}
+body.light #ui button.prim:hover{background:#da1}
+body.light #ui .sep{background:#ccc}
+body.light #zoom-display{color:#999}
+body.light #theme-btn{background:#ddd8d0;color:#555;border-color:#bbb}
+body.light #theme-btn:hover{color:#a80;border-color:#a80}
+body.light .intro-title{color:#333}
+body.light .intro-sub{color:#999}
+body.light .intro-pts{color:#999}
+body.light .intro-type{color:#999}
+body.light .intro-enter{color:#999}
+body.light .intro-bar-wrap{background:#ddd}
+body.light .intro-dot{background:#ddd}
 
-@media (max-width:560px){
-  .cal-cell{padding:4px}
-  .cal-num{font-size:15px}
-  .cal-tag{font-size:7px}
-}
+/* ── SETTINGS PANEL ── */
+#settings-overlay{position:absolute;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.72);display:none;flex-direction:column;
+  align-items:center;justify-content:center;z-index:30;pointer-events:none}
+#settings-overlay>*{pointer-events:auto}
+.settings-panel{background:#121212;border:1px solid #3c3c3c;
+  border-radius:10px;padding:24px 32px;width:460px;max-width:92%}
+.settings-title{font-size:20px;font-weight:bold;color:#ffc832;
+  text-align:center;margin-bottom:16px;letter-spacing:2px}
+.settings-row{display:flex;align-items:center;padding:8px 0;
+  border-bottom:1px solid #222}
+.settings-row:last-child{border:none}
+.settings-label{font-size:14px;color:#d7d7d7;flex:1}
+.settings-control{display:flex;align-items:center;gap:10px}
+.settings-control input[type=range]{width:120px;accent-color:#ffc832}
+.settings-control .val{font-size:13px;color:#ffc832;min-width:50px;text-align:right}
+.settings-toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.settings-toggle input{opacity:0;width:0;height:0}
+.settings-toggle .slider{position:absolute;inset:0;background:#323232;
+  border-radius:22px;transition:.2s}
+.settings-toggle .slider::before{content:'';position:absolute;left:3px;top:3px;
+  width:16px;height:16px;background:#888;border-radius:50%;transition:.2s}
+.settings-toggle input:checked+.slider{background:#50dc78}
+.settings-toggle input:checked+.slider::before{background:#fff;transform:translateX(18px)}
+.settings-hint{font-size:12px;color:#464646;text-align:center;margin-top:14px}
+
+/* ── EXPORT BUTTONS ── */
+.export-actions{display:flex;gap:18px;margin-top:14px}
+.export-actions button{padding:10px 26px;font:15px monospace;font-weight:bold;
+  background:#1a2a2a;color:#8cc;border:1px solid #2a6a6a;border-radius:8px;
+  cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.export-actions button:hover{background:#2a4a4a;color:#aff;border-color:#4a9a9a}
+
+#export-svg-btn-look, #export-png-btn-look{display:none}
+
+/* ── HUD ── */
+#hud{position:absolute;top:56px;left:14px;font:13px monospace;color:#828282;
+  line-height:1.8;pointer-events:none;z-index:5}
+body.light #hud{color:#999}
 </style>
 </head>
 <body>
-<div class="pg-bg-grid"></div>
-<div class="pg-wrap">
 
-  <header class="pg-header">
-    <div class="pg-bolts"><span class="panel-screw"></span><span class="panel-screw"></span></div>
-    <div>
-      <div class="pg-username">// exam planner v2 — interactive</div>
-      <h1 class="pg-title">Wiskunde</h1>
-    </div>
-    <div class="pg-subtitle">EXAM_TARGET: 2026-06-17</div>
-  </header>
+<div id="canvas-wrap">
+  <canvas id="c"></canvas>
 
-  <section class="progress-panel">
-    <div class="progress-head">
-      <div class="progress-title">Voortgang</div>
-      <div class="progress-meta"><span id="pct">0%</span> · <b id="done">0</b> / <span id="total">0</span> criteria voltooid</div>
-    </div>
-    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
-    <div class="bar-ticks"><span>START</span><span>25%</span><span>50%</span><span>75%</span><span>EXAM</span></div>
-  </section>
+  <div id="intro">
+    <div class="intro-title">CIRCLE CONSTRUCTION</div>
+    <div class="intro-sub">choose your depth</div>
+    <div class="intro-level" id="lvlNum">3</div>
+    <div class="intro-name" id="lvlName">expanded</div>
+    <div class="intro-pts" id="ptsLine">POINTS: <span class="hl">4</span>  [← →] or [A D]</div>
+    <div class="intro-type" id="typeLine">or type a number directly</div>
+    <div class="intro-bar-wrap"><div class="intro-bar-fill" id="barFill"></div></div>
+    <div class="intro-enter">[ENTER] to start</div>
+    <div class="intro-dots" id="dotsWrap"></div>
+  </div>
 
-  <div class="pg-section-label">01 — kalender · juni 2026</div>
+  <button id="theme-btn">[B] DARK</button>
 
-  <section class="calendar">
-    <div class="cal-head">
-      <div class="cal-month">Juni 2026<small>13 DAGEN TE GAAN</small></div>
-      <div class="cal-legend">
-        <span class="lg study">studie</span>
-        <span class="lg rest">vrij</span>
-        <span class="lg exam">examen</span>
-        <span class="lg done">af</span>
+  <div id="hud"></div>
+
+  <div id="settings-overlay">
+    <div class="settings-panel">
+      <div class="settings-title">⚙ SETTINGS</div>
+      <div class="settings-row">
+        <span class="settings-label">base radius</span>
+        <div class="settings-control">
+          <input type="range" id="s-base-radius" min="40" max="400" value="140" step="10">
+          <span class="val" id="s-base-radius-val">140px</span>
+        </div>
       </div>
+      <div class="settings-row">
+        <span class="settings-label">speed</span>
+        <div class="settings-control">
+          <input type="range" id="s-speed" min="0.25" max="8" value="1" step="0.25">
+          <span class="val" id="s-speed-val">1.00x</span>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">show circle count</span>
+        <div class="settings-control">
+          <label class="settings-toggle">
+            <input type="checkbox" id="s-show-circles" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">show level</span>
+        <div class="settings-control">
+          <label class="settings-toggle">
+            <input type="checkbox" id="s-show-level" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">show total levels</span>
+        <div class="settings-control">
+          <label class="settings-toggle">
+            <input type="checkbox" id="s-show-total-levels">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">show zoom</span>
+        <div class="settings-control">
+          <label class="settings-toggle">
+            <input type="checkbox" id="s-show-zoom" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">show speed</span>
+        <div class="settings-control">
+          <label class="settings-toggle">
+            <input type="checkbox" id="s-show-speed" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-hint">[TAB] or [ENTER] back &middot; arrows to adjust</div>
     </div>
-    <div class="cal-grid" id="calGrid"></div>
-  </section>
+  </div>
 
-  <div class="pg-section-label">02 — dagdetail</div>
-  <section class="detail" id="detail">
-    <div class="detail-empty">// klik op een dag in de kalender</div>
-  </section>
-
-  <footer class="pg-footer">
-    <div class="pg-footer-l">
-      <span class="status-dot"></span>
-      <span>System online — voortgang opgeslagen in browser</span>
+  <div id="complete-overlay">
+    <div class="complete-title">CONSTRUCTION COMPLETE</div>
+    <div class="complete-actions">
+      <button id="choice-menu-btn">← MAIN MENU</button>
+      <button id="choice-look-btn">LOOK AROUND</button>
     </div>
-    <button class="reset-btn" id="resetBtn"><i class="ti ti-refresh"></i> reset alles</button>
-  </footer>
+    <div class="export-actions">
+      <button id="choice-svg-btn">EXPORT SVG</button>
+      <button id="choice-png-btn">EXPORT PNG</button>
+    </div>
+    <div id="export-msg" style="font:14px monospace;color:#8c8;margin-top:16px"></div>
+  </div>
+</div>
+
+<div id="ui">
+  <label>LEVEL</label>
+  <input type="range" id="level-slider" min="1" max="99" value="3">
+  <span class="val" id="level-val">3</span>
+  <div class="sep"></div>
+  <label>POINTS</label>
+  <input type="range" id="pts-slider" min="2" max="24" value="4">
+  <span class="val" id="pts-val">4</span>
+  <div class="sep"></div>
+  <button id="start-btn" class="prim">▶ START</button>
+  <button id="pause-btn" disabled style="display:none">▐▐ PAUSE</button>
+  <button id="restart-btn" disabled style="display:none">↺ RESTART</button>
+  <button id="export-svg-btn-look" disabled style="display:none">EXPORT SVG</button>
+  <button id="export-png-btn-look" disabled style="display:none">EXPORT PNG</button>
+  <button id="menu-btn">← MENU</button>
+  <div class="sep"></div>
+  <span id="zoom-display">zoom <span class="hl">100%</span></span>
+  <div class="sep"></div>
+  <button id="settings-btn">⚙ SETTINGS</button>
+  <span style="font:12px monospace;color:#555;margin-left:auto">
+    scroll to zoom &middot; drag to pan
+  </span>
 </div>
 
 <script>
-const PLAN = {
-  '2026-06-04': {tag:'DAG 1 · START', topic:'Hoofdstuk 6 — Basisbegrippen functies (deel 1)', chapters:['CH 6'], items:[
-    'Theorie: recht/omgekeerd evenredige grootheden + soorten verbanden',
-    'Voorstellingswijzen: verwoording, tabel, grafiek, voorschrift + verbanden leggen',
-    'Onafhankelijke vs afhankelijke variabele',
-    'Bepalen of een grafiek/verwoording een functie is',
-    'Voorschrift opstellen + tabel opstellen + grafiek tekenen',
-    "Lesvideo's + presentaties bekijken"
-  ]},
-  '2026-06-05': {tag:'DAG 2 · VRIJ', topic:'Vrije dag — geen studie', rest:true, items:[]},
-  '2026-06-06': {tag:'DAG 3 · THEORIE', topic:'Hoofdstuk 6 — Basisbegrippen functies (deel 2)', chapters:['CH 6'], items:[
-    'Functievoorschrift, invoer- en functiewaarde (aflezen + berekenen)',
-    'Domein, bereik, nulwaarde, nulpunt (aflezen + berekenen)',
-    'Tekentabel + tekenverloop opstellen, grafiek tekenen bij tekenverloop',
-    'Extrema bepalen, stijgen/dalen/constant onderzoeken, verloopschema opstellen',
-    'Symmetrie t.o.v. oorsprong of verticale rechte onderzoeken',
-    'Oefeningen maken + definities memoriseren'
-  ]},
-  '2026-06-07': {tag:'DAG 4 · THEORIE', topic:'Hoofdstuk 7 — Eerstegraadsfuncties (deel 1)', chapters:['CH 7'], items:[
-    'Definitie lineaire functie + eerstegraadsfunctie + voorschrift herkennen',
-    'Richtingscoëfficiënt aflezen + berekenen',
-    'Snijpunten met x-as en y-as aflezen + berekenen',
-    'Verloop (stijgend/dalend) bepalen via richtingscoëfficiënt',
-    'Tabel + grafiek bij gegeven voorschrift, tekentabel opstellen',
-    'Bepalen of een punt op de grafiek ligt via voorschrift'
-  ]},
-  '2026-06-08': {tag:'DAG 5 · THEORIE', topic:'Hoofdstuk 7 — Eerstegraadsfuncties (deel 2)', chapters:['CH 7'], items:[
-    'Voorschrift opstellen via grafiek / tabel / verwoording',
-    'Voorschrift met gegeven rico + punt',
-    'Voorschrift door twee gegeven punten',
-    'Constante functies: herkennen, snijpunten, tekentabel, voorschrift opstellen',
-    'Grafieken tekenen in GeoGebra (A4)',
-    'Vraagstukken met eerstegraadsfuncties oplossen'
-  ]},
-  '2026-06-09': {tag:'DAG 6 · ALGEBRA', topic:'Hoofdstuk 7 vergelijkingen/ongelijkheden + Hoofdstuk 11', chapters:['CH 7','CH 11'], items:[
-    'Eerstegraadsvergelijking met één onbekende oplossen',
-    'Eerstegraadsongelijkheid algebraïsch oplossen',
-    'Eerstegraadsongelijkheid grafisch oplossen',
-    'Vergelijking grafisch oplossen via snijpunt',
-    'Ongelijkheid oplossen via tekenverloop',
-    'Vraagstuk met eerstegraadsfunctie / ongelijkheid',
-    'CH 11: ontbinden — gemeenschappelijke factor afzonderen',
-    'CH 11: ontbinden via merkwaardige producten',
-    'CH 11: ontbinden via termen samennemen',
-    'Z-route: som/verschil van twee derdemachten + x²+(a+b)x+ab'
-  ]},
-  '2026-06-10': {tag:'DAG 7 · MEETKUNDE', topic:'Hoofdstuk 9 — Stelling van Pythagoras', chapters:['CH 9'], items:[
-    'Kwadraten + vierkantswortels van reële getallen berekenen',
-    'Stelling van Pythagoras in woorden + symbolen + bewijs studeren',
-    'Toepassing: zijde berekenen in rechthoekige driehoek',
-    'Meetkundige problemen oplossen met Pythagoras',
-    '√n construeren op de getallenas',
-    'Omgekeerde stelling: aantonen dat driehoek rechthoekig is',
-    'Afstandsformule tussen twee punten in het vlak',
-    'Pythagoras in ruimtelichaam: ruimtediagonaal berekenen',
-    'Hoogte van een piramide berekenen'
-  ]},
-  '2026-06-11': {tag:'DAG 8 · MEETKUNDE', topic:'Hoofdstuk 5.6 Thales + 9.1 Metrische betrekkingen (NW/Z)', chapters:['CH 5.6','CH 9.1'], items:[
-    'Evenwijdige projectie van punt, lijnstuk en rechte op een rechte tekenen',
-    'Beeld van projectie aflezen op tekening',
-    'Bewijs stelling van Thales',
-    'Metr. betr.: begrippen + eigenschappen in woorden & symbolen',
-    'Bewijs van de eigenschappen i.v.m. metrische betrekkingen',
-    'Toepassingen metrische betrekkingen in rechthoekige driehoeken'
-  ]},
-  '2026-06-12': {tag:'DAG 9 · VRIJ', topic:'Vrije dag — geen studie', rest:true, items:[]},
-  '2026-06-13': {tag:'DAG 10 · GONIOMETRIE', topic:'Hoofdstuk 10 — Goniometrie (deel 1)', chapters:['CH 10'], items:[
-    'Sin/cos/tan van scherpe hoek in rechthoekige driehoek definiëren',
-    'Goniometrisch getal noteren als verhouding van zijden',
-    'Rechthoekige driehoek construeren bij gegeven gon. getal',
-    'Goniometrische getallen berekenen met RM / ICT',
-    'Verband sin/cos van complementaire hoeken',
-    'Hoekgrootte berekenen bij gegeven goniometrisch getal'
-  ]},
-  '2026-06-14': {tag:'DAG 11 · GONIO + MEETK.', topic:'Hoofdstuk 10 (deel 2) + Hoofdstuk 12', chapters:['CH 10','CH 12'], items:[
-    'Grondformule goniometrie + verband sin/cos/tan in symbolen',
-    'Bewijs grondformule + verband sin/cos/tan',
-    'Zijden en hoeken berekenen in rechthoekige driehoek',
-    'Zijden en hoeken berekenen in ruimtefiguren',
-    'CH 12: definitie + tekenen + herkennen van 4 merkwaardige lijnen',
-    'Omgeschreven cirkel construeren (passer + GeoGebra)',
-    'Ingeschreven cirkel construeren (passer + GeoGebra)',
-    'Zwaartelijnen tekenen + zwaartepunt bepalen',
-    'Eigenschap zwaartelijnen in woorden & symbolen + toepassen',
-    'Combi-oefening: zwaartelijnen + Pythagoras + gelijkvormigheid + metr. betr.'
-  ]},
-  '2026-06-15': {tag:'DAG 12 · HERHALING', topic:'Volledige herhaling + oefentoets', chapters:['ALL'], items:[
-    'Alle definities overhoren (functies, eerstegraads, Pythagoras, gonio, merkw. lijnen)',
-    'Gemengde oefenreeks: 2 oefeningen per hoofdstuk',
-    'Vraagstukken (eerstegraadsfuncties + Pythagoras + gonio)',
-    'GeoGebra-handelingen herhalen',
-    'Zwakke punten noteren voor morgen'
-  ]},
-  '2026-06-16': {tag:'DAG 13 · FINALE', topic:'Bewijzen + zwakke punten — laatste check', chapters:['FOCUS'], items:[
-    'Bewijs Thales opnieuw schrijven',
-    'Bewijs Pythagoras opnieuw schrijven',
-    'Bewijs metrische betrekkingen opnieuw schrijven',
-    'Bewijs grondformule goniometrie opnieuw schrijven',
-    'Zwakke punten van gisteren bijwerken',
-    'Flashcards: rico, domein/bereik, gonio-verhoudingen, merkw. lijnen',
-    'Materiaal klaarleggen: RM, geodriehoek, passer, potlood, GeoGebra-toegang',
-    'Vroeg slapen'
-  ]},
-  '2026-06-17': {tag:'EXAM DAY · GO TIME', topic:'Examen Wiskunde', exam:true, chapters:['EXAM'], items:[
-    'Goed ontbijten',
-    'Materiaal nakijken vóór vertrek',
-    'Diep ademhalen — je bent klaar'
-  ]},
+// ───────────────────────────────────────────────────────
+// GEOMETRY
+// ───────────────────────────────────────────────────────
+
+const HALF_PI = Math.PI / 2;
+const TAU     = 2 * Math.PI;
+
+function midpoint(a, b) {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+}
+function distance(a, b) {
+  return Math.hypot(a[0] - b[0], a[1] - b[1]);
+}
+function circleFromPoints(a, b) {
+  return { center: midpoint(a, b), radius: distance(a, b) / 2 };
+}
+function angleOnCircle(center, point) {
+  return Math.atan2(point[1] - center[1], point[0] - center[0]);
+}
+function farthestExtent(origin, circles) {
+  let best = 0;
+  for (const { center, radius } of circles)
+    best = Math.max(best, distance(origin, center) + radius);
+  return best;
+}
+function projectOntoRing(points, origin, ringRadius) {
+  return points.map(p => {
+    const ang = Math.atan2(p[1] - origin[1], p[0] - origin[0]);
+    return [origin[0] + ringRadius * Math.cos(ang),
+            origin[1] + ringRadius * Math.sin(ang)];
+  });
+}
+function deduplicate(points, snap = 1) {
+  const seen = new Set(), out = [];
+  for (const p of points) {
+    const key = `${Math.round(p[0]/snap)},${Math.round(p[1]/snap)}`;
+    if (!seen.has(key)) { seen.add(key); out.push(p); }
+  }
+  return out;
+}
+function allPairs(points) {
+  const pairs = [];
+  for (let i = 0; i < points.length; i++)
+    for (let j = i + 1; j < points.length; j++)
+      pairs.push([points[i], points[j]]);
+  return pairs;
+}
+function cardinalPoints(center, radius, count = 4) {
+  const pts = [];
+  for (let i = 0; i < count; i++) {
+    const a = -HALF_PI + TAU * i / count;
+    pts.push([center[0] + radius * Math.cos(a),
+              center[1] + radius * Math.sin(a)]);
+  }
+  return pts;
+}
+
+function easeInOut(t) { return t * t * (3 - 2 * t); }
+function drawDur() {
+  return Math.max(0.025, 0.30 / (1.0 + 0.35 * (state.level - 1))) / state.speed;
+}
+
+// ───────────────────────────────────────────────────────
+// THEMES & COLOUR
+// ───────────────────────────────────────────────────────
+
+function interpStops(stops, t) {
+  t = Math.max(0, Math.min(1, t));
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [pos, col] = stops[i];
+    const [npos, ncol] = stops[i + 1];
+    if (t >= pos && t <= npos) {
+      const lt = (t - pos) / (npos - pos);
+      return [Math.round(col[0]+(ncol[0]-col[0])*lt),
+              Math.round(col[1]+(ncol[1]-col[1])*lt),
+              Math.round(col[2]+(ncol[2]-col[2])*lt)];
+    }
+  }
+  return stops[stops.length - 1][1];
+}
+
+const PREVIEW_STOPS = [
+  [0.0,  [255, 130,  40]],
+  [0.25, [ 70, 230,  90]],
+  [0.5,  [ 40, 190, 255]],
+  [0.75, [190,  70, 255]],
+  [1.0,  [255,  60, 190]],
+];
+
+function previewColor(t) {
+  return interpStops(PREVIEW_STOPS, t);
+}
+
+const DARK = {
+  bg:       '#0a0a0a',
+  label:    'DARK',
+  circleStops: [
+    [0.0,  [255, 130,  40]],
+    [0.25, [ 70, 230,  90]],
+    [0.5,  [ 40, 190, 255]],
+    [0.75, [190,  70, 255]],
+    [1.0,  [255,  60, 190]],
+  ],
+  pointStops: [
+    [0.0,  [255, 220,  60]],
+    [0.25, [140, 255, 110]],
+    [0.5,  [ 90, 230, 255]],
+    [0.75, [230, 120, 255]],
+    [1.0,  [255, 110, 210]],
+  ],
 };
 
-const STORAGE_KEY = 'wisk-planner-v2';
-let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+const LIGHT = {
+  bg:       '#f5f0eb',
+  label:    'LIGHT',
+  circleStops: [
+    [0.0,  [180,  85,  25]],
+    [0.25, [ 35, 145,  55]],
+    [0.5,  [ 25, 105, 165]],
+    [0.75, [105,  45, 165]],
+    [1.0,  [165,  35, 105]],
+  ],
+  pointStops: [
+    [0.0,  [200, 150,  35]],
+    [0.25, [ 95, 185,  65]],
+    [0.5,  [ 55, 155, 195]],
+    [0.75, [145,  75, 185]],
+    [1.0,  [185,  65, 135]],
+  ],
+};
 
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-
-function totalCounts(){
-  let total=0, done=0;
-  for (const [k,d] of Object.entries(PLAN)){
-    total += d.items.length;
-    const s = state[k] || [];
-    done += s.filter(Boolean).length;
-  }
-  return {total, done};
+function depthColor(theme, depth01, baseAlpha = 220) {
+  const t = Math.max(0, Math.min(1, depth01));
+  const [r, g, b] = interpStops(theme.circleStops, t);
+  const s = baseAlpha / 255;
+  return `rgba(${Math.round(r*s)},${Math.round(g*s)},${Math.round(b*s)},1)`;
+}
+function pointColor(theme, depth01, alpha = 255) {
+  const t = Math.max(0, Math.min(1, depth01));
+  const [r, g, b] = interpStops(theme.pointStops, t);
+  const s = alpha / 255;
+  return `rgb(${Math.round(r*s)},${Math.round(g*s)},${Math.round(b*s)})`;
 }
 
-function dayProgress(k){
-  const d = PLAN[k]; if(!d || !d.items.length) return {done:0,total:0,complete:false};
-  const s = state[k] || [];
-  const done = s.filter(Boolean).length;
-  return {done, total:d.items.length, complete: done === d.items.length};
+// ───────────────────────────────────────────────────────
+// CANVAS SETUP
+// ───────────────────────────────────────────────────────
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const wrap = document.getElementById('canvas-wrap');
+
+let W, H, cx, cy;
+function resize() {
+  const rect = wrap.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  W = rect.width; H = rect.height;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  cx = W / 2; cy = H / 2;
 }
+window.addEventListener('resize', resize);
 
-function renderProgress(){
-  const {total, done} = totalCounts();
-  const pct = total ? Math.round(done/total*100) : 0;
-  document.getElementById('pct').textContent = pct + '%';
-  document.getElementById('done').textContent = done;
-  document.getElementById('total').textContent = total;
-  document.getElementById('barFill').style.width = pct + '%';
-}
+// ───────────────────────────────────────────────────────
+// CAMERA
+// ───────────────────────────────────────────────────────
 
-function renderCalendar(){
-  const grid = document.getElementById('calGrid');
-  grid.innerHTML = '';
-  const dows = ['MA','DI','WO','DO','VR','ZA','ZO'];
-  dows.forEach(d => { const el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+const camera = {
+  origin: [0, 0],
+  zoom: 1,
+  panX: 0, panY: 0,
+  w2s(pt) {
+    return [(pt[0]-this.origin[0])*this.zoom+cx+this.panX,
+            (pt[1]-this.origin[1])*this.zoom+cy+this.panY];
+  },
+  r2s(r) { return r * this.zoom; },
+  fitRadius(worldRadius, margin = 0.88) {
+    this.zoom = Math.min(W, H) / 2 * margin / Math.max(worldRadius, 0.001);
+  },
+  scroll(dy) { this.zoom *= (dy > 0 ? 1.15 : 1/1.15); },
+};
 
-  // June 2026: June 1 is a Monday
-  const firstDow = 0; // Monday = 0 in our grid
-  for (let i=0;i<firstDow;i++){ const e=document.createElement('div'); e.className='cal-cell empty'; grid.appendChild(e); }
+// ───────────────────────────────────────────────────────
+// BACKGROUND ANIMATION  (port of intro.py BackgroundAnim)
+// ───────────────────────────────────────────────────────
 
-  for (let day=1; day<=30; day++){
-    const dd = String(day).padStart(2,'0');
-    const key = `2026-06-${dd}`;
-    const plan = PLAN[key];
-    const cell = document.createElement('div');
-    cell.className = 'cal-cell';
-    cell.dataset.key = key;
-    let tagText = '';
-    if (plan){
-      if (plan.exam){ cell.classList.add('exam'); tagText='EXAM'; }
-      else if (plan.rest){ cell.classList.add('rest'); tagText='VRIJ'; }
-      else {
-        const p = dayProgress(key);
-        if (p.complete) cell.classList.add('done');
-        else if (p.done>0) cell.classList.add('has-progress');
-        tagText = p.total ? `${p.done}/${p.total}` : '';
-      }
+const bg = {
+  t0: 0,
+  frameId: null,
+
+  start() {
+    this.t0 = performance.now();
+    this.frameId = requestAnimationFrame(t => this.tick(t));
+  },
+
+  stop() {
+    if (this.frameId) { cancelAnimationFrame(this.frameId); this.frameId = null; }
+  },
+
+  tick(now) {
+    this.draw((now - this.t0) / 1000);
+    this.frameId = requestAnimationFrame(t => this.tick(t));
+  },
+
+  draw(t) {
+    const th = state.theme;
+    ctx.fillStyle = th.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const BR = 90;
+    const N = state.pointCount;
+    const breath = 1 + 0.07 * Math.sin(t * 0.85);
+    const r = BR * breath;
+
+    // rings
+    const ringsToShow = Math.min(state.level, 5);
+    for (let i = 0; i < ringsToShow; i++) {
+      const rr = r * (1 + i * 0.55);
+      const dep = i / Math.max(ringsToShow - 1, 1);
+      const col = previewColor(dep);
+      const alpha = Math.max(20, 140 - i * 22);
+      ctx.beginPath();
+      ctx.arc(cx, cy, rr, 0, TAU);
+      ctx.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha/255})`;
+      ctx.stroke();
     }
-    cell.innerHTML = `<div class="cal-num">${day}</div><div class="cal-tag">${tagText}</div><div class="cal-dot"></div>`;
-    if (plan) cell.addEventListener('click', ()=> selectDay(key));
-    else cell.style.cursor='default';
-    grid.appendChild(cell);
+
+    // base circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, TAU);
+    ctx.strokeStyle = `rgba(90,90,90,${170/255})`;
+    ctx.stroke();
+
+    // points
+    const pts = [];
+    for (let i = 0; i < N; i++) {
+      const a = -HALF_PI + TAU * i / N;
+      pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+
+    // inner pair circles
+    for (const [px, py] of pts) {
+      const mr = Math.hypot(px - cx, py - cy) / 2;
+      const mcx = (px + cx) / 2, mcy = (py + cy) / 2;
+      ctx.beginPath();
+      ctx.arc(mcx, mcy, mr, 0, TAU);
+      ctx.strokeStyle = `rgba(65,65,65,${80/255})`;
+      ctx.stroke();
+    }
+
+    // neighbor pair circles
+    for (let i = 0; i < N; i++) {
+      const [p1x, p1y] = pts[i];
+      const [p2x, p2y] = pts[(i + 1) % N];
+      const mr = Math.hypot(p1x - p2x, p1y - p2y) / 2;
+      const mcx = (p1x + p2x) / 2, mcy = (p1y + p2y) / 2;
+      ctx.beginPath();
+      ctx.arc(mcx, mcy, mr, 0, TAU);
+      ctx.strokeStyle = `rgba(55,55,55,${60/255})`;
+      ctx.stroke();
+    }
+
+    // expanding wave
+    const wavePeriod = 3.5;
+    const phase = (t % wavePeriod) / wavePeriod;
+    const waveR = r * (1 + phase * 2.8);
+    const wCol = previewColor(phase);
+    ctx.beginPath();
+    ctx.arc(cx, cy, waveR, 0, TAU);
+    ctx.strokeStyle = `rgba(${wCol[0]},${wCol[1]},${wCol[2]},${Math.round((1-phase)*55)/255})`;
+    ctx.stroke();
+
+    // dots for each point
+    for (const [px, py] of pts) {
+      ctx.beginPath(); ctx.arc(px, py, 4, 0, TAU);
+      ctx.fillStyle = `rgba(255,220,50,${170/255})`;
+      ctx.fill();
+    }
+    // center dot
+    ctx.beginPath(); ctx.arc(cx, cy, 4, 0, TAU);
+    ctx.fillStyle = `rgba(255,220,50,${200/255})`;
+    ctx.fill();
+  },
+};
+
+// ───────────────────────────────────────────────────────
+// INTRO OVERLAY
+// ───────────────────────────────────────────────────────
+
+const LEVEL_NAMES = {1:"base",2:"default",3:"expanded",4:"deep",5:"intense",
+                     6:"extreme",7:"void",8:"abyss",9:"beyond"};
+
+function levelName(n) { return LEVEL_NAMES[n] || `depth ${n}`; }
+
+const lvlNumEl  = document.getElementById('lvlNum');
+const lvlNameEl = document.getElementById('lvlName');
+const ptsLineEl = document.getElementById('ptsLine');
+const typeLine  = document.getElementById('typeLine');
+const barFill   = document.getElementById('barFill');
+const dotsWrap  = document.getElementById('dotsWrap');
+
+function updateIntro() {
+  // Flush digit buffer on timeout
+  if (state._digitBuf && performance.now() - state._digitTs > state._DIGIT_TIMEOUT) {
+    state._digitBuf = '';
+  }
+
+  const lvl  = state.level;
+  const pts  = state.pointCount;
+  const depT = Math.min(1, (lvl - 1) / 8);
+  const col  = previewColor(depT);
+
+  lvlNumEl.textContent = lvl;
+  lvlNumEl.style.color = `rgb(${col[0]},${col[1]},${col[2]})`;
+
+  lvlNameEl.textContent = levelName(lvl);
+  const nameCol = interpStops([...PREVIEW_STOPS], depT);
+  lvlNameEl.style.color = `rgb(${nameCol[0]},${nameCol[1]},${nameCol[2]})`;
+
+  ptsLineEl.innerHTML = `POINTS: <span class="hl" style="color:rgb(${col[0]},${col[1]},${col[2]})">${pts}</span>  [← →] or [A D]`;
+
+  // digit buffer indicator
+  typeLine.innerHTML = state._digitBuf
+    ? `<span class="act">typing: ${state._digitBuf}_</span>`
+    : 'or type a number directly';
+
+  // progress bar
+  const pct = Math.min(100, ((lvl - 1) / 8) * 100);
+  barFill.style.width = pct + '%';
+  barFill.style.background = `rgb(${col[0]},${col[1]},${col[2]})`;
+
+  // dots
+  const MAX_DOTS = 9;
+  const shown = Math.min(lvl, MAX_DOTS);
+  dotsWrap.innerHTML = '';
+  for (let i = 0; i < MAX_DOTS; i++) {
+    const dot = document.createElement('span');
+    dot.className = 'intro-dot' + (i < shown ? ' act' : '');
+    if (i < shown) {
+      const dc = previewColor(i / (MAX_DOTS - 1));
+      dot.style.background = `rgb(${dc[0]},${dc[1]},${dc[2]})`;
+    }
+    dotsWrap.appendChild(dot);
+  }
+  if (lvl > MAX_DOTS) {
+    const extra = document.createElement('span');
+    extra.className = 'intro-dots-extra';
+    extra.textContent = `+${lvl - MAX_DOTS}`;
+    dotsWrap.appendChild(extra);
   }
 }
 
-let activeKey = null;
-function selectDay(key){
-  activeKey = key;
-  document.querySelectorAll('.cal-cell').forEach(c => c.classList.toggle('active', c.dataset.key === key));
-  renderDetail();
+// ───────────────────────────────────────────────────────
+// CONSTRUCTION STATE
+// ───────────────────────────────────────────────────────
+
+const state = {
+  running: false,
+  paused: false,
+  done: false,
+  theme: DARK,
+  level: 3,
+  pointCount: 4,
+  origin: [0, 0],
+  baseRadius: 140,
+  speed: 1.0,
+  showCircleCount: true,
+  showLevel: true,
+  showTotalLevels: false,
+  showZoom: true,
+  showSpeed: true,
+  outer: [],
+  doneCircles: [],
+  donePoints: [],
+  animCircle: null,
+  animT: 0,
+  steps: [],
+  stepIdx: 0,
+  stepTimer: null,
+  panning: false,
+  panStart: null,
+  _extent: 0,
+  _projPts: [],
+  _allPts: [],
+  _digitBuf: '',
+  _digitTs: 0,
+  _DIGIT_TIMEOUT: 1200,
+  _inSettings: false,
+};
+
+// ───────────────────────────────────────────────────────
+// STEP SEQUENCER
+// ───────────────────────────────────────────────────────
+
+function buildSteps() {
+  const steps = [];
+  const A = state.origin;
+  const R = state.baseRadius;
+  const N = state.pointCount;
+  const outer = cardinalPoints(A, R, N);
+  state.outer = outer;
+  const PAUSE = 0.06 / state.speed, STAGE = 0.28 / state.speed;
+  const DUR = drawDur();
+
+  steps.push({ type: 'render' });
+  steps.push({ type: 'pause', dur: 0.3 / state.speed });
+  steps.push({ type: 'arc', center: A, radius: R, depth: 0, from: outer[0], dur: DUR });
+  steps.push({ type: 'pause', dur: STAGE });
+  steps.push({ type: 'fadePts', pts: [A, ...outer], depth: 0, stagger: 0.07 / state.speed });
+  steps.push({ type: 'pause', dur: STAGE });
+  for (const pt of outer) {
+    const c = circleFromPoints(A, pt);
+    steps.push({ type: 'arc', center: c.center, radius: c.radius, depth: 0, from: A, dur: DUR });
+    steps.push({ type: 'pause', dur: PAUSE });
+  }
+  steps.push({ type: 'pause', dur: STAGE });
+  for (const [p1, p2] of allPairs(outer)) {
+    const c = circleFromPoints(p1, p2);
+    steps.push({ type: 'arc', center: c.center, radius: c.radius, depth: 0, from: p1, dur: DUR });
+  }
+  steps.push({ type: 'pause', dur: STAGE });
+  if (state.level === 1) { steps.push({ type: 'done' }); return steps; }
+
+  // Level 2 — extents computed at runtime via step types
+  steps.push({ type: 'calcExtent' });
+  steps.push({ type: 'ringArc', depth: 1, dur: DUR });
+  steps.push({ type: 'pause', dur: STAGE });
+  steps.push({ type: 'lvl2ProjFade', depth: 1, stagger: 0.07 / state.speed });
+  steps.push({ type: 'pause', dur: STAGE });
+  steps.push({ type: 'genPairs', depth: 1 });
+  steps.push({ type: 'pause', dur: STAGE });
+  steps.push({ type: 'calcExtent' });
+  steps.push({ type: 'ringArc', depth: 1, dur: DUR });
+  steps.push({ type: 'pause', dur: STAGE });
+  if (state.level === 2) { steps.push({ type: 'done' }); return steps; }
+
+  // Level 3+
+  const maxDepthVal = state.level - 1;
+  for (let lvl = 3; lvl <= state.level; lvl++) {
+    const dep = (lvl - 1) / maxDepthVal;
+    const stagger = Math.max(0.005, 0.06 / (lvl - 1)) / state.speed;
+    steps.push({ type: 'calcExtent' });
+    steps.push({ type: 'projAndFade', depth: dep, stagger });
+    steps.push({ type: 'pause', dur: STAGE });
+    steps.push({ type: 'genPairs', depth: dep });
+    steps.push({ type: 'pause', dur: STAGE });
+    steps.push({ type: 'calcExtent' });
+    steps.push({ type: 'ringArc', depth: dep, dur: DUR });
+    steps.push({ type: 'pause', dur: STAGE });
+  }
+  steps.push({ type: 'done' });
+  return steps;
 }
 
-function renderDetail(){
-  const detail = document.getElementById('detail');
-  if (!activeKey){ detail.innerHTML='<div class="detail-empty">// klik op een dag in de kalender</div>'; return; }
-  const d = PLAN[activeKey];
-  const dt = new Date(activeKey+'T00:00');
-  const dows = ['ZO','MA','DI','WO','DO','VR','ZA'];
-  const months = ['JAN','FEB','MAA','APR','MEI','JUN','JUL','AUG','SEP','OKT','NOV','DEC'];
-  const label = `${dows[dt.getDay()]} ${String(dt.getDate()).padStart(2,'0')} ${months[dt.getMonth()]}`;
-  detail.className = 'detail' + (d.exam ? ' exam-day' : '');
-  const chapters = (d.chapters||[]).map(c=>`<span class="chapter-pill">${c}</span>`).join('');
-  const s = state[activeKey] || [];
-  const items = d.items.map((t,i)=>`<li data-i="${i}" class="${s[i]?'checked':''}"><div class="cbox"><i class="ti ti-check"></i></div><div class="crit-text">${t}</div></li>`).join('');
-  detail.innerHTML = `
-    <div class="detail-head">
-      <div class="detail-date">${label}<small>${d.tag}</small></div>
-      <div class="detail-tag">${d.items.length} criteria</div>
-    </div>
-    <div class="detail-topic">${d.topic}</div>
-    <div class="detail-chapters">${chapters}</div>
-    ${d.items.length ? `<ul class="criteria">${items}</ul>` : '<div class="detail-empty">// rustdag · niets te doen</div>'}
-  `;
-  detail.querySelectorAll('.criteria li').forEach(li => {
-    li.addEventListener('click', ()=>{
-      const i = +li.dataset.i;
-      const arr = state[activeKey] || new Array(d.items.length).fill(false);
-      arr[i] = !arr[i];
-      state[activeKey] = arr;
-      save();
-      li.classList.toggle('checked');
-      renderProgress();
-      // update calendar cell tag/state
-      const cell = document.querySelector(`.cal-cell[data-key="${activeKey}"]`);
-      if (cell){
-        const p = dayProgress(activeKey);
-        cell.classList.toggle('done', p.complete);
-        cell.classList.toggle('has-progress', p.done>0 && !p.complete);
-        cell.querySelector('.cal-tag').textContent = `${p.done}/${p.total}`;
-      }
-    });
+// ───────────────────────────────────────────────────────
+// DRAWING
+// ───────────────────────────────────────────────────────
+
+function drawCircle(center, radius, color) {
+  const [sx, sy] = camera.w2s(center);
+  const sr = camera.r2s(radius);
+  if (sr < 1) return;
+  ctx.beginPath(); ctx.arc(sx, sy, sr, 0, TAU);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+}
+function drawArc(center, radius, startAngle, sweep, color) {
+  const [sx, sy] = camera.w2s(center);
+  const sr = camera.r2s(radius);
+  if (sr < 1 || sweep <= 0) return;
+  ctx.beginPath(); ctx.arc(sx, sy, sr, startAngle, startAngle + TAU * sweep);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+}
+function drawDot(pt, color, r = 5) {
+  const [sx, sy] = camera.w2s(pt);
+  ctx.beginPath(); ctx.arc(sx, sy, r, 0, TAU);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function render() {
+  const th = state.theme;
+  ctx.fillStyle = th.bg;
+  ctx.fillRect(0, 0, W, H);
+  const maxDepth = state.doneCircles.length
+    ? Math.max(...state.doneCircles.map(c => c.depth), 1) : 1;
+  for (const c of state.doneCircles) {
+    const alpha = Math.round(220 - c.depth * 100);
+    drawCircle(c.center, c.radius, depthColor(th, c.depth / maxDepth, Math.max(60, alpha)));
+  }
+  if (state.animCircle && state.animT > 0) {
+    const ac = state.animCircle;
+    drawArc(ac.center, ac.radius, ac.startAngle, state.animT,
+            depthColor(th, ac.depth / Math.max(maxDepth, 1)));
+  }
+  for (const p of state.donePoints) {
+    drawDot([p[0], p[1]], pointColor(th, p[3] / Math.max(maxDepth, 1), p[2]));
+  }
+  updateHUD();
+  const zd = document.getElementById('zoom-display');
+  if (state.showZoom) {
+    zd.innerHTML = `zoom <span class="hl">${(camera.zoom*100).toFixed(0)}%</span>`;
+    zd.style.display = '';
+  } else {
+    zd.style.display = 'none';
+  }
+}
+
+// ───────────────────────────────────────────────────────
+// EXPORT
+// ───────────────────────────────────────────────────────
+
+function rgbHex(r, g, b) {
+  return '#' + [r,g,b].map(c => Math.round(c).toString(16).padStart(2,'0')).join('');
+}
+
+function exportSVG() {
+  const th = state.theme;
+  const circles = state.doneCircles;
+  const points = state.donePoints;
+  const maxDepth = circles.length ? Math.max(...circles.map(c => c.depth), 1) : 1;
+
+  let allX = [], allY = [];
+  for (const c of circles) {
+    allX.push(c.center[0] - c.radius, c.center[0] + c.radius);
+    allY.push(c.center[1] - c.radius, c.center[1] + c.radius);
+  }
+  for (const p of points) { allX.push(p[0]); allY.push(p[1]); }
+
+  let minX, maxX, minY, maxY;
+  if (allX.length) {
+    minX = Math.min(...allX); maxX = Math.max(...allX);
+    minY = Math.min(...allY); maxY = Math.max(...allY);
+  } else {
+    minX = minY = 0; maxX = maxY = 100;
+  }
+  const pad = Math.max(maxX - minX, maxY - minY) * 0.05 || 50;
+  minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+  const w = maxX - minX, h = maxY - minY;
+
+  const lines = [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${w} ${h}">`,
+    `  <rect x="${minX}" y="${minY}" width="${w}" height="${h}" fill="${th.bg}"/>`
+  ];
+  for (const c of circles) {
+    const col = depthColor(th, c.depth / maxDepth);
+    const m = col.match(/rgba?\((\d+),(\d+),(\d+)/);
+    const hex = m ? rgbHex(+m[1], +m[2], +m[3]) : '#888';
+    lines.push(`  <circle cx="${c.center[0]}" cy="${c.center[1]}" r="${c.radius}" fill="none" stroke="${hex}" stroke-width="1"/>`);
+  }
+  for (const p of points) {
+    if (p[2] <= 0) continue;
+    const col = pointColor(th, p[3] / maxDepth, p[2]);
+    const m = col.match(/rgb\((\d+),(\d+),(\d+)/);
+    const hex = m ? rgbHex(+m[1], +m[2], +m[3]) : '#ffc832';
+    lines.push(`  <circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${hex}"/>`);
+  }
+  lines.push('</svg>');
+  downloadBlob(lines.join('\n'), 'construction.svg', 'image/svg+xml');
+  showExportMsg('SVG saved');
+}
+
+function exportPNG() {
+  canvas.toBlob(blob => {
+    downloadBlob(blob, 'construction.png', 'image/png');
+    showExportMsg('PNG saved');
   });
 }
 
-document.getElementById('resetBtn').addEventListener('click', ()=>{
-  if (!confirm('Alle voortgang wissen?')) return;
-  state = {}; save(); renderCalendar(); renderProgress(); if(activeKey) renderDetail();
+function downloadBlob(content, filename, mime) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function showExportMsg(msg) {
+  const el = document.getElementById('export-msg');
+  if (el) { el.textContent = msg + ' ✓'; setTimeout(() => el.textContent = '', 2000); }
+}
+
+// ───────────────────────────────────────────────────────
+// HUD
+// ───────────────────────────────────────────────────────
+
+function updateHUD() {
+  const lines = [];
+  if (state.showLevel) {
+    let s = 'level  ' + state.level;
+    if (state.showTotalLevels) s += ' / ' + state.level;
+    lines.push(s);
+  } else if (state.showTotalLevels) {
+    lines.push('/ ' + state.level + ' levels');
+  }
+  if (state.showCircleCount) {
+    lines.push('circles  ' + (state.doneCircles.length + (state.animCircle ? 1 : 0)));
+  }
+  if (state.showSpeed) {
+    lines.push('speed  ' + state.speed.toFixed(2) + 'x');
+  }
+  if (state.paused) lines.push('— PAUSED —');
+  document.getElementById('hud').textContent = lines.join('\n');
+}
+
+// ───────────────────────────────────────────────────────
+// STEP SEQUENCER
+// ───────────────────────────────────────────────────────
+
+let animFrameId = null;
+let autoZoomPending = false;
+
+function startConstruction() {
+  state.running = true;
+  state.paused = false;
+  state.done = false;
+  state.doneCircles = [];
+  state.donePoints = [];
+  state.animCircle = null;
+  state.animT = 0;
+  state.stepIdx = 0;
+  camera.panX = 0;
+  camera.panY = 0;
+  const r = farthestExtent(state.origin, [{ center: state.origin, radius: state.baseRadius }]);
+  camera.fitRadius(r * 2, 0.85);
+
+  bg.stop();
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('start-btn').textContent = '■ STOP';
+  document.getElementById('start-btn').classList.remove('prim');
+  document.getElementById('pause-btn').style.display = '';
+  document.getElementById('restart-btn').style.display = 'none';
+  document.getElementById('level-slider').disabled = true;
+  document.getElementById('pts-slider').disabled = true;
+  menuBtn.style.display = '';
+  completeOverlay.style.display = 'none';
+
+  state.steps = buildSteps();
+  runStep();
+}
+
+function stopConstruction() {
+  state.running = false;
+  state.paused = false;
+  if (state.stepTimer) { clearTimeout(state.stepTimer); state.stepTimer = null; }
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+}
+
+function complete() {
+  state.done = true;
+  state.running = false;
+  state.animCircle = null;
+  document.getElementById('start-btn').textContent = '↺ RESTART';
+  document.getElementById('start-btn').classList.add('prim');
+  document.getElementById('pause-btn').style.display = 'none';
+  document.getElementById('restart-btn').style.display = 'none';
+  document.getElementById('level-slider').disabled = false;
+  document.getElementById('pts-slider').disabled = false;
+  menuBtn.style.display = 'none';
+  exportSvgLook.style.display = 'none';
+  exportPngLook.style.display = 'none';
+  completeOverlay.style.display = 'flex';
+  render();
+  animFrameId = requestAnimationFrame(render);
+}
+
+function runStep() {
+  if (!state.running || state.paused) return;
+  if (state.stepIdx >= state.steps.length) { complete(); render(); return; }
+  const step = state.steps[state.stepIdx++];
+
+  switch (step.type) {
+    case 'render': render(); scheduleNext(0); break;
+    case 'pause': scheduleNext(step.dur * 1000); break;
+
+    case 'arc': {
+      const { center, radius, depth, from, dur } = step;
+      const startAngle = from != null ? angleOnCircle(center, from) : -HALF_PI;
+      state.animCircle = { center, radius, depth, startAngle };
+      state.animT = 0;
+      const t0 = performance.now();
+      (function tick() {
+        if (!state.running || state.paused) return;
+        const raw = Math.min((performance.now() - t0) / 1000 / dur, 1);
+        state.animT = easeInOut(raw);
+        render();
+        if (raw < 1) { animFrameId = requestAnimationFrame(tick); }
+        else {
+          state.animT = 1;
+          state.doneCircles.push({ center, radius, depth });
+          state.animCircle = null;
+          state.animT = 0;
+          autoZoomPending = true;
+          render();
+          scheduleNext(0);
+        }
+      })();
+      break;
+    }
+
+    case 'fadePts': {
+      const { pts, depth, stagger } = step;
+      const baseIdx = state.donePoints.length;
+      for (const pt of pts) state.donePoints.push([pt[0], pt[1], 0, depth]);
+      const n = pts.length;
+      const timers = pts.map((_, i) => -(i * stagger));
+      const flags = pts.map(() => false);
+      const fadeDur = 0.38;
+      let lastT = performance.now();
+      (function tick() {
+        if (!state.running) return;
+        const now = performance.now();
+        const dt = state.paused ? 0 : (now - lastT);
+        lastT = now;
+        let allDone = true;
+        for (let i = 0; i < n; i++) {
+          if (flags[i]) continue;
+          timers[i] += dt / 1000;
+          if (timers[i] < 0) { allDone = false; continue; }
+          const raw = Math.min(timers[i] / fadeDur, 1);
+          state.donePoints[baseIdx + i][2] = Math.round(easeInOut(raw) * 255);
+          if (raw < 1) allDone = false; else flags[i] = true;
+        }
+        render();
+        if (!allDone) animFrameId = requestAnimationFrame(tick);
+        else scheduleNext(0);
+      })();
+      break;
+    }
+
+    case 'calcExtent':
+      state._extent = farthestExtent(state.origin, state.doneCircles);
+      scheduleNext(0);
+      break;
+
+    case 'ringArc': {
+      const radius = state._extent;
+      if (radius < 1) { scheduleNext(0); break; }
+      const { depth, dur } = step;
+      const center = state.origin;
+      const startAngle = -HALF_PI;
+      state.animCircle = { center, radius, depth, startAngle };
+      state.animT = 0;
+      const t0 = performance.now();
+      (function tick() {
+        if (!state.running || state.paused) return;
+        const raw = Math.min((performance.now() - t0) / 1000 / dur, 1);
+        state.animT = easeInOut(raw);
+        render();
+        if (raw < 1) { animFrameId = requestAnimationFrame(tick); }
+        else {
+          state.animT = 1;
+          state.doneCircles.push({ center, radius, depth });
+          state.animCircle = null;
+          state.animT = 0;
+          autoZoomPending = true;
+          render();
+          scheduleNext(0);
+        }
+      })();
+      break;
+    }
+
+    case 'lvl2ProjFade': {
+      const { depth, stagger } = step;
+      const outer = state.outer;
+      const innerMids = outer.map(pt => midpoint(state.origin, pt));
+      const projected = projectOntoRing(innerMids, state.origin, state._extent);
+      const deDuped = deduplicate(projected, 1);
+      state._projPts = deDuped;
+      state._allPts = [state.origin, ...deDuped, ...outer];
+      const baseIdx = state.donePoints.length;
+      for (const pt of deDuped) state.donePoints.push([pt[0], pt[1], 0, depth]);
+      const n = deDuped.length;
+      const timers = deDuped.map((_, i) => -(i * stagger));
+      const flags = deDuped.map(() => false);
+      const fadeDur = 0.38;
+      let lastT = performance.now();
+      (function tick() {
+        if (!state.running) return;
+        const now = performance.now();
+        const dt = state.paused ? 0 : (now - lastT);
+        lastT = now;
+        let allDone = true;
+        for (let i = 0; i < n; i++) {
+          if (flags[i]) continue;
+          timers[i] += dt / 1000;
+          if (timers[i] < 0) { allDone = false; continue; }
+          const raw = Math.min(timers[i] / fadeDur, 1);
+          state.donePoints[baseIdx + i][2] = Math.round(easeInOut(raw) * 255);
+          if (raw < 1) allDone = false; else flags[i] = true;
+        }
+        render();
+        if (!allDone) animFrameId = requestAnimationFrame(tick);
+        else scheduleNext(0);
+      })();
+      break;
+    }
+
+    case 'projAndFade': {
+      const { depth, stagger } = step;
+      const source = state._allPts;
+      const projected = projectOntoRing(source, state.origin, state._extent);
+      const deDuped = deduplicate(projected, 1);
+      state._projPts = deDuped;
+      state._allPts = [...state._allPts, ...deDuped];
+      const baseIdx = state.donePoints.length;
+      for (const pt of deDuped) state.donePoints.push([pt[0], pt[1], 0, depth]);
+      const n = deDuped.length;
+      const timers = deDuped.map((_, i) => -(i * stagger));
+      const flags = deDuped.map(() => false);
+      const fadeDur = 0.38;
+      let lastT = performance.now();
+      (function tick() {
+        if (!state.running) return;
+        const now = performance.now();
+        const dt = state.paused ? 0 : (now - lastT);
+        lastT = now;
+        let allDone = true;
+        for (let i = 0; i < n; i++) {
+          if (flags[i]) continue;
+          timers[i] += dt / 1000;
+          if (timers[i] < 0) { allDone = false; continue; }
+          const raw = Math.min(timers[i] / fadeDur, 1);
+          state.donePoints[baseIdx + i][2] = Math.round(easeInOut(raw) * 255);
+          if (raw < 1) allDone = false; else flags[i] = true;
+        }
+        render();
+        if (!allDone) animFrameId = requestAnimationFrame(tick);
+        else scheduleNext(0);
+      })();
+      break;
+    }
+
+    case 'genPairs': {
+      const { depth } = step;
+      const pts = state._allPts;
+      const pairs = allPairs(pts);
+      const pairSteps = [];
+      for (const [p1, p2] of pairs) {
+        const c = circleFromPoints(p1, p2);
+        pairSteps.push({ type: 'arc', center: c.center, radius: c.radius, depth, from: p1, dur: drawDur() });
+      }
+      state.steps.splice(state.stepIdx, 0, ...pairSteps);
+      scheduleNext(0);
+      break;
+    }
+
+    case 'done': complete(); break;
+  }
+}
+
+function scheduleNext(ms) {
+  if (state.stepTimer) { clearTimeout(state.stepTimer); state.stepTimer = null; }
+  if (autoZoomPending) {
+    const extent = farthestExtent(state.origin, state.doneCircles);
+    if (extent > 0) camera.fitRadius(extent, 0.88);
+    autoZoomPending = false;
+  }
+  state.stepTimer = setTimeout(() => { state.stepTimer = null; runStep(); }, ms || 16);
+}
+
+// ───────────────────────────────────────────────────────
+// UI CONTROLS
+// ───────────────────────────────────────────────────────
+
+const levelSlider = document.getElementById('level-slider');
+const ptsSlider   = document.getElementById('pts-slider');
+const levelVal    = document.getElementById('level-val');
+const ptsVal      = document.getElementById('pts-val');
+const startBtn     = document.getElementById('start-btn');
+const pauseBtn     = document.getElementById('pause-btn');
+const restartBtn   = document.getElementById('restart-btn');
+const themeBtn     = document.getElementById('theme-btn');
+const menuBtn      = document.getElementById('menu-btn');
+const choiceMenuBtn = document.getElementById('choice-menu-btn');
+const choiceLookBtn = document.getElementById('choice-look-btn');
+const completeOverlay = document.getElementById('complete-overlay');
+
+levelSlider.addEventListener('input', () => {
+  state.level = +levelSlider.value;
+  levelVal.textContent = state.level;
+  updateIntro();
+});
+ptsSlider.addEventListener('input', () => {
+  state.pointCount = +ptsSlider.value;
+  ptsVal.textContent = state.pointCount;
+  updateIntro();
 });
 
-renderCalendar();
-renderProgress();
-// auto-select today if in range, else first study day
-const today = new Date(); const todayKey = `2026-06-${String(today.getDate()).padStart(2,'0')}`;
-if (today.getFullYear()===2026 && today.getMonth()===5 && PLAN[todayKey]) selectDay(todayKey);
-else selectDay('2026-06-04');
+startBtn.addEventListener('click', () => {
+  if (state.running) { stopConstruction(); resetUI(); return; }
+  if (state.done) { resetUI(); return; }
+  startConstruction();
+});
+
+pauseBtn.addEventListener('click', () => {
+  state.paused = !state.paused;
+  pauseBtn.textContent = state.paused ? '▶ PLAY' : '▐▐ PAUSE';
+  if (!state.paused) {
+    const anyActive = state.animCircle && state.animT > 0 && state.animT < 1;
+    if (!anyActive) runStep();
+  }
+});
+
+restartBtn.addEventListener('click', resetUI);
+
+menuBtn.addEventListener('click', resetUI);
+choiceMenuBtn.addEventListener('click', resetUI);
+choiceLookBtn.addEventListener('click', () => {
+  completeOverlay.style.display = 'none';
+  menuBtn.style.display = '';
+  exportSvgLook.style.display = '';
+  exportPngLook.style.display = '';
+});
+
+function resetUI() {
+  stopConstruction();
+  state.done = false;
+  state.running = false;
+  state.doneCircles = [];
+  state.donePoints = [];
+  state.animCircle = null;
+  state.animT = 0;
+  state._extent = 0;
+  state._projPts = [];
+  state._allPts = [];
+  state._digitBuf = '';
+  state._digitTs = 0;
+  state._inSettings = false;
+  document.getElementById('intro').style.display = '';
+  document.getElementById('start-btn').textContent = '▶ START';
+  document.getElementById('start-btn').classList.add('prim');
+  document.getElementById('pause-btn').style.display = 'none';
+  document.getElementById('pause-btn').disabled = true;
+  document.getElementById('restart-btn').style.display = 'none';
+  document.getElementById('restart-btn').disabled = true;
+  document.getElementById('level-slider').disabled = false;
+  document.getElementById('pts-slider').disabled = false;
+  menuBtn.style.display = 'none';
+  exportSvgLook.style.display = 'none';
+  exportPngLook.style.display = 'none';
+  completeOverlay.style.display = 'none';
+  settingsOverlay.style.display = 'none';
+  bg.start();
+}
+
+themeBtn.addEventListener('click', () => {
+  state.theme = state.theme === DARK ? LIGHT : DARK;
+  themeBtn.textContent = `[B] ${state.theme.label}`;
+  document.body.classList.toggle('light', state.theme === LIGHT);
+  if (!state.running && !state.done) {
+    // update intro colors on theme change by reseting
+  }
+});
+
+// ── Settings ──
+
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsBtn     = document.getElementById('settings-btn');
+const sBaseRadius     = document.getElementById('s-base-radius');
+const sBaseRadiusVal  = document.getElementById('s-base-radius-val');
+const sSpeed          = document.getElementById('s-speed');
+const sSpeedVal       = document.getElementById('s-speed-val');
+const sShowCircles    = document.getElementById('s-show-circles');
+const sShowLevel      = document.getElementById('s-show-level');
+const sShowTotalLevels= document.getElementById('s-show-total-levels');
+const sShowZoom       = document.getElementById('s-show-zoom');
+const sShowSpeed      = document.getElementById('s-show-speed');
+
+function openSettings() {
+  sBaseRadius.value = state.baseRadius;
+  sBaseRadiusVal.textContent = state.baseRadius + 'px';
+  sSpeed.value = state.speed;
+  sSpeedVal.textContent = state.speed.toFixed(2) + 'x';
+  sShowCircles.checked = state.showCircleCount;
+  sShowLevel.checked = state.showLevel;
+  sShowTotalLevels.checked = state.showTotalLevels;
+  sShowZoom.checked = state.showZoom;
+  sShowSpeed.checked = state.showSpeed;
+  state._inSettings = true;
+  settingsOverlay.style.display = 'flex';
+}
+
+function closeSettings() {
+  state._inSettings = false;
+  settingsOverlay.style.display = 'none';
+}
+
+settingsBtn.addEventListener('click', openSettings);
+
+settingsOverlay.addEventListener('click', e => {
+  if (e.target === settingsOverlay) closeSettings();
+});
+
+sBaseRadius.addEventListener('input', () => {
+  state.baseRadius = +sBaseRadius.value;
+  sBaseRadiusVal.textContent = state.baseRadius + 'px';
+});
+
+sSpeed.addEventListener('input', () => {
+  state.speed = +sSpeed.value;
+  sSpeedVal.textContent = state.speed.toFixed(2) + 'x';
+});
+
+sShowCircles.addEventListener('change', () => { state.showCircleCount = sShowCircles.checked; render(); });
+sShowLevel.addEventListener('change', () => { state.showLevel = sShowLevel.checked; render(); });
+sShowTotalLevels.addEventListener('change', () => { state.showTotalLevels = sShowTotalLevels.checked; render(); });
+sShowZoom.addEventListener('change', () => { state.showZoom = sShowZoom.checked; render(); });
+sShowSpeed.addEventListener('change', () => { state.showSpeed = sShowSpeed.checked; render(); });
+
+// ── Export buttons (completion overlay) ──
+
+const choiceSvgBtn = document.getElementById('choice-svg-btn');
+const choicePngBtn = document.getElementById('choice-png-btn');
+choiceSvgBtn.addEventListener('click', exportSVG);
+choicePngBtn.addEventListener('click', exportPNG);
+
+// ── Export buttons (look-around) ──
+
+const exportSvgLook = document.getElementById('export-svg-btn-look');
+const exportPngLook = document.getElementById('export-png-btn-look');
+exportSvgLook.addEventListener('click', exportSVG);
+exportPngLook.addEventListener('click', exportPNG);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'b' || e.key === 'B') themeBtn.click();
+  if (e.key === 'p' || e.key === 'P') pauseBtn.click();
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    if (state._inSettings) closeSettings();
+    else if (!state.running && !state.done) openSettings();
+    return;
+  }
+  if (e.key === 'Escape' || e.key === 'm' || e.key === 'M') {
+    if (state._inSettings) { closeSettings(); return; }
+    if (state.running || state.done) menuBtn.click();
+  }
+
+  // Settings panel controls
+  if (state._inSettings) {
+    const rows = ['s-base-radius','s-speed','s-show-circles','s-show-level','s-show-total-levels','s-show-zoom','s-show-speed'];
+    let idx = rows.indexOf(document.activeElement?.id);
+    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+      e.preventDefault();
+      idx = Math.min(rows.length - 1, (idx < 0 ? -1 : idx) + 1);
+      document.getElementById(rows[idx]).focus();
+    } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+      e.preventDefault();
+      idx = Math.max(0, (idx < 0 ? 1 : idx) - 1);
+      document.getElementById(rows[idx]).focus();
+    } else if (e.key === 'Enter') {
+      closeSettings();
+    }
+    return;
+  }
+
+  if (e.key === 'Enter' && !state.running) startBtn.click();
+
+  // Intro keyboard controls (only when not running)
+  if (!state.running && !state.done) {
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+      state.level = Math.min(99, state.level + 1);
+      levelSlider.value = state.level;
+      levelVal.textContent = state.level;
+      updateIntro();
+    }
+    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+      state.level = Math.max(1, state.level - 1);
+      levelSlider.value = state.level;
+      levelVal.textContent = state.level;
+      updateIntro();
+    }
+    if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+      state.pointCount = Math.min(24, state.pointCount + 1);
+      ptsSlider.value = state.pointCount;
+      ptsVal.textContent = state.pointCount;
+      updateIntro();
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+      state.pointCount = Math.max(2, state.pointCount - 1);
+      ptsSlider.value = state.pointCount;
+      ptsVal.textContent = state.pointCount;
+      updateIntro();
+    }
+
+    // Digit typing (multi-digit with timeout)
+    if (e.key >= '0' && e.key <= '9') {
+      const now = performance.now();
+      if (now - state._digitTs > state._DIGIT_TIMEOUT) state._digitBuf = '';
+      state._digitBuf += e.key;
+      state._digitTs = now;
+      const val = parseInt(state._digitBuf);
+      if (val >= 1) {
+        state.level = Math.min(99, val);
+        levelSlider.value = state.level;
+        levelVal.textContent = state.level;
+        updateIntro();
+      }
+    }
+    if (e.key === 'Backspace') {
+      if (state._digitBuf) {
+        state._digitBuf = state._digitBuf.slice(0, -1);
+        const val = state._digitBuf ? parseInt(state._digitBuf) : 1;
+        state.level = Math.max(1, val);
+        levelSlider.value = state.level;
+        levelVal.textContent = state.level;
+        updateIntro();
+      }
+    }
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','W','s','S','a','A','d','D'].includes(e.key)) {
+      state._digitBuf = '';
+    }
+  }
+});
+
+// ───────────────────────────────────────────────────────
+// ZOOM & PAN
+// ───────────────────────────────────────────────────────
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  camera.scroll(-Math.sign(e.deltaY));
+  render();
+}, { passive: false });
+
+canvas.addEventListener('mousedown', e => {
+  if (e.button === 0 && state.running) {
+    state.panning = true;
+    state.panStart = { x: e.clientX, y: e.clientY, px: camera.panX, py: camera.panY };
+    canvas.style.cursor = 'grabbing';
+  }
+});
+window.addEventListener('mousemove', e => {
+  if (state.panning) {
+    camera.panX = state.panStart.px + e.clientX - state.panStart.x;
+    camera.panY = state.panStart.py + e.clientY - state.panStart.y;
+    render();
+  }
+});
+window.addEventListener('mouseup', () => {
+  if (state.panning) { state.panning = false; canvas.style.cursor = ''; }
+});
+
+// ───────────────────────────────────────────────────────
+// INIT
+// ───────────────────────────────────────────────────────
+
+resize();
+updateIntro();
+bg.start();
 </script>
 </body>
 </html>
